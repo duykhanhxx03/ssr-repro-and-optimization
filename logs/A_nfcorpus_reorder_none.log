@@ -1,0 +1,32 @@
+2026-10-11 20:01:25,277 [INFO] mode=exact+sparse-cache | encode=cuda | score=index | cuda_available=True | gpu_name=NVIDIA GeForce RTX 5060
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 10179.11it/s]
+2026-10-11 20:01:25,813 [INFO] Evaluation variant: SSR
+2026-10-11 20:01:25,814 [INFO] === Evaluating nfcorpus (NFCorpus) ===
+2026-10-11 20:01:25,814 [INFO] Metrics for nfcorpus: mrr@[] ndcg@[10]
+2026-10-11 20:01:25,841 [INFO] Loading cached corpus embeddings: D:\No-Kmeans-code-paper\repro\cache\A\nfcorpus\corpus_32k_test.npz
+2026-10-11 20:01:27,109 [INFO] Encoding queries (323) ...
+[run_eval] ignoring SAE config keys not supported by repo: {'center_inputs': False, 'l2_normalize_inputs': False}
+[run_eval] loaded D:\No-Kmeans-code-paper\repro\ckpt\SSR-tok: n_latents=16384 topk=32 token_scope=non-cls q_len=192 d_len=512 expansion=False vocab=30524 skiplist=32
+Encode queries:   0%|          | 0/41 [00:00<?, ?it/s]Encode queries:   2%|▏         | 1/41 [00:11<07:40, 11.52s/it]Encode queries:   7%|▋         | 3/41 [00:11<01:55,  3.05s/it]Encode queries:  17%|█▋        | 7/41 [00:11<00:33,  1.01it/s]Encode queries:  27%|██▋       | 11/41 [00:11<00:15,  1.93it/s]Encode queries:  44%|████▍     | 18/41 [00:12<00:05,  4.15it/s]Encode queries:  59%|█████▊    | 24/41 [00:12<00:02,  6.60it/s]Encode queries:  73%|███████▎  | 30/41 [00:12<00:01,  9.70it/s]Encode queries:  88%|████████▊ | 36/41 [00:12<00:00, 13.54it/s]Encode queries: 100%|██████████| 41/41 [00:12<00:00,  3.30it/s]
+Exact retrieve [index-first, CPU index]:   0%|          | 0/1 [00:00<?, ?it/s]Exact retrieve [index-first, CPU index]: 100%|██████████| 1/1 [00:47<00:00, 47.89s/it]Exact retrieve [index-first, CPU index]: 100%|██████████| 1/1 [00:47<00:00, 47.89s/it]
+2026-10-11 20:02:27,445 [INFO] Retrieval timing [nfcorpus]: index_build=46.134s (1 shard-ingests) | retrieve_score=1.759s | wall=47.894s | per-query_score=0.0054s (n_queries=323)
+2026-10-11 20:02:27,482 [INFO]   accuracy@1: 0.0898
+2026-10-11 20:02:27,482 [INFO]   accuracy@10: 0.3746
+2026-10-11 20:02:27,482 [INFO]   accuracy@100: 0.7895
+2026-10-11 20:02:27,482 [INFO]   map@100: 0.0380
+2026-10-11 20:02:27,482 [INFO]   ndcg@10: 0.0833
+2026-10-11 20:02:27,482 [INFO]   precision@1: 0.0898
+2026-10-11 20:02:27,482 [INFO]   precision@10: 0.0644
+2026-10-11 20:02:27,483 [INFO]   precision@100: 0.0339
+2026-10-11 20:02:27,483 [INFO]   recall@1: 0.0101
+2026-10-11 20:02:27,483 [INFO]   recall@10: 0.0533
+2026-10-11 20:02:27,483 [INFO]   recall@100: 0.1903
+2026-10-11 20:02:27,483 [INFO]   retrieval_index_seconds: 46.1342
+2026-10-11 20:02:27,483 [INFO]   retrieval_n_index_builds: 1.0000
+2026-10-11 20:02:27,483 [INFO]   retrieval_n_queries: 323.0000
+2026-10-11 20:02:27,483 [INFO]   retrieval_score_seconds: 1.7592
+2026-10-11 20:02:27,483 [INFO]   retrieval_score_seconds_per_query: 0.0054
+2026-10-11 20:02:27,483 [INFO]   retrieval_seconds_per_query: 0.0054
+2026-10-11 20:02:27,483 [INFO]   retrieval_total_seconds: 47.8937
+2026-10-11 20:02:27,483 [INFO]   retrieval_wall_seconds: 47.8937
+2026-10-11 20:02:27,483 [INFO] Wrote metrics to results\A_nfcorpus_reorder_none.json

@@ -1,0 +1,31 @@
+2026-10-11 20:52:39,897 [INFO] mode=exact+e2e-index | encode=cuda | score=index | cuda_available=True | gpu_name=NVIDIA GeForce RTX 5060
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 8018.55it/s]
+2026-10-11 20:52:40,543 [INFO] Evaluation variant: SSR
+2026-10-11 20:52:40,544 [INFO] === Evaluating nfcorpus (NFCorpus) ===
+2026-10-11 20:52:40,544 [INFO] Metrics for nfcorpus: mrr@[] ndcg@[10]
+Global index cache [read arrays]:   0%|          | 0/1 [00:00<?, ?it/s]Global index cache [read arrays]: 100%|██████████| 1/1 [00:00<00:00,  3.73it/s]Global index cache [read arrays]: 100%|██████████| 1/1 [00:00<00:00,  3.73it/s]
+2026-10-11 20:52:40,906 [INFO] Loaded global index cache: 34237956 postings, reorder=frequency
+2026-10-11 20:52:40,910 [INFO] Loaded E2E index: 3633 docs, 34237956 postings
+2026-10-11 20:52:40,910 [INFO] Encoding queries (323) ...
+Encode queries:   0%|          | 0/41 [00:00<?, ?it/s]Encode queries:   2%|▏         | 1/41 [00:00<00:34,  1.16it/s]Encode queries:  15%|█▍        | 6/41 [00:00<00:04,  7.94it/s]Encode queries:  24%|██▍       | 10/41 [00:01<00:02, 12.93it/s]Encode queries:  34%|███▍      | 14/41 [00:01<00:01, 17.78it/s]Encode queries:  46%|████▋     | 19/41 [00:01<00:00, 23.48it/s]Encode queries:  56%|█████▌    | 23/41 [00:01<00:00, 26.50it/s]Encode queries:  68%|██████▊   | 28/41 [00:01<00:00, 30.52it/s]Encode queries:  78%|███████▊  | 32/41 [00:01<00:00, 30.95it/s]Encode queries:  88%|████████▊ | 36/41 [00:01<00:00, 31.74it/s]Encode queries:  98%|█████████▊| 40/41 [00:01<00:00, 33.28it/s]Encode queries: 100%|██████████| 41/41 [00:01<00:00, 21.21it/s]
+E2E retrieve [global index]:   0%|          | 0/21 [00:00<?, ?it/s]E2E retrieve [global index]:   5%|▍         | 1/21 [00:01<00:20,  1.01s/it]E2E retrieve [global index]:  10%|▉         | 2/21 [00:01<00:13,  1.41it/s]E2E retrieve [global index]:  14%|█▍        | 3/21 [00:02<00:11,  1.62it/s]E2E retrieve [global index]:  19%|█▉        | 4/21 [00:02<00:09,  1.75it/s]E2E retrieve [global index]:  24%|██▍       | 5/21 [00:03<00:09,  1.65it/s]E2E retrieve [global index]:  29%|██▊       | 6/21 [00:03<00:09,  1.57it/s]E2E retrieve [global index]:  33%|███▎      | 7/21 [00:04<00:08,  1.64it/s]E2E retrieve [global index]:  38%|███▊      | 8/21 [00:04<00:07,  1.79it/s]E2E retrieve [global index]:  43%|████▎     | 9/21 [00:05<00:06,  1.75it/s]E2E retrieve [global index]:  48%|████▊     | 10/21 [00:06<00:09,  1.22it/s]E2E retrieve [global index]:  52%|█████▏    | 11/21 [00:08<00:10,  1.05s/it]E2E retrieve [global index]:  57%|█████▋    | 12/21 [00:09<00:10,  1.15s/it]E2E retrieve [global index]:  62%|██████▏   | 13/21 [00:11<00:09,  1.20s/it]E2E retrieve [global index]:  67%|██████▋   | 14/21 [00:12<00:08,  1.24s/it]E2E retrieve [global index]:  71%|███████▏  | 15/21 [00:13<00:07,  1.17s/it]E2E retrieve [global index]:  76%|███████▌  | 16/21 [00:14<00:05,  1.17s/it]E2E retrieve [global index]:  81%|████████  | 17/21 [00:16<00:05,  1.28s/it]E2E retrieve [global index]:  86%|████████▌ | 18/21 [00:16<00:03,  1.06s/it]E2E retrieve [global index]:  90%|█████████ | 19/21 [00:17<00:01,  1.09it/s]E2E retrieve [global index]:  95%|█████████▌| 20/21 [00:17<00:00,  1.28it/s]E2E retrieve [global index]: 100%|██████████| 21/21 [00:17<00:00,  1.18it/s]
+2026-10-11 20:53:00,692 [INFO] Retrieval timing [nfcorpus, e2e-index]: index_build=0.000s (0 shard-ingests) | retrieve_score=17.820s | wall=17.820s | per-query_score=0.0552s (n_queries=323)
+2026-10-11 20:53:00,718 [INFO]   accuracy@1: 0.6316
+2026-10-11 20:53:00,718 [INFO]   accuracy@10: 0.8824
+2026-10-11 20:53:00,718 [INFO]   accuracy@100: 0.9505
+2026-10-11 20:53:00,718 [INFO]   map@100: 0.2233
+2026-10-11 20:53:00,718 [INFO]   ndcg@10: 0.4400
+2026-10-11 20:53:00,718 [INFO]   precision@1: 0.6316
+2026-10-11 20:53:00,718 [INFO]   precision@10: 0.2762
+2026-10-11 20:53:00,718 [INFO]   precision@100: 0.0748
+2026-10-11 20:53:00,718 [INFO]   recall@1: 0.0944
+2026-10-11 20:53:00,718 [INFO]   recall@10: 0.2371
+2026-10-11 20:53:00,718 [INFO]   recall@100: 0.3696
+2026-10-11 20:53:00,718 [INFO]   retrieval_index_seconds: 0.0000
+2026-10-11 20:53:00,718 [INFO]   retrieval_n_index_builds: 0.0000
+2026-10-11 20:53:00,718 [INFO]   retrieval_n_queries: 323.0000
+2026-10-11 20:53:00,718 [INFO]   retrieval_score_seconds: 17.8198
+2026-10-11 20:53:00,718 [INFO]   retrieval_score_seconds_per_query: 0.0552
+2026-10-11 20:53:00,718 [INFO]   retrieval_seconds_per_query: 0.0552
+2026-10-11 20:53:00,718 [INFO]   retrieval_total_seconds: 17.8198
+2026-10-11 20:53:00,718 [INFO]   retrieval_wall_seconds: 17.8198

@@ -1,0 +1,3 @@
+scifact:train docs=5183 queries=809 load=2.2s rss=1.20GB
+[repo_exact t=1] nDCG@10=69.39 R@100=92.84 mean(batch,incl build)=347.1ms build=8.454063099998166 rss=1.24GB
+[repo_ssrpp t=1] nDCG@10=69.35 R@100=91.98 mean(batch,incl build)=212.1ms build=None rss=1.32GB

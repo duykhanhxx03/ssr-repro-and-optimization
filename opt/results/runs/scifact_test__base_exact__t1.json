@@ -1,0 +1,43 @@
+{
+  "dataset": "scifact",
+  "split": "test",
+  "method": "base_exact",
+  "spec": "base_exact",
+  "threads": 1,
+  "n_queries": 300,
+  "top_k": 100,
+  "exact": "yes (reference)",
+  "ndcg@10": 0.8783362070743334,
+  "recall@100": 1.0,
+  "recall@10": 0.964,
+  "metrics": {
+    "accuracy@1": 0.79,
+    "accuracy@10": 0.9733333333333334,
+    "accuracy@100": 1.0,
+    "precision@1": 0.79,
+    "recall@1": 0.7569444444444445,
+    "precision@10": 0.10766666666666667,
+    "recall@10": 0.964,
+    "precision@100": 0.011300000000000001,
+    "recall@100": 1.0,
+    "ndcg@10": 0.8783362070743334,
+    "map@100": 0.848112603076747
+  },
+  "latency": {
+    "mean_ms": 365.8610190000036,
+    "p50_ms": 333.8146999994933,
+    "p95_ms": 677.8507699998045,
+    "max_ms": 927.2960999987845,
+    "n_timed": 300
+  },
+  "index": {
+    "build_s": 9.49240909999935
+  },
+  "build_wall_s": 9.4946443000008,
+  "rss_gb": 1.930039296,
+  "peak_gb": 5.09104128,
+  "other_eval_procs": [],
+  "cpu": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+  "numba_threading_layer": "omp",
+  "tag": "small"
+}

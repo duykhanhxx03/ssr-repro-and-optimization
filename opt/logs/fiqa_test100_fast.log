@@ -1,0 +1,4 @@
+fiqa:test docs=57638 queries=100 load=9.3s rss=3.05GB
+[fast_hyb t=6] nDCG@10=45.36 R@100=73.95 mean=83.23ms p50=83.80 p95=125.01 build=2.6073194999953557 rss=5.18GB
+[fast_ub t=6] nDCG@10=45.36 R@100=73.95 mean=206.71ms p50=210.73 p95=278.13 build=2.6073194999953557 rss=5.20GB
+[fast_ssrpp t=6] nDCG@10=37.58 R@100=52.02 mean=19.02ms p50=19.63 p95=26.37 build=2.6073194999953557 rss=5.20GB

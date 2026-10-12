@@ -1,0 +1,45 @@
+{
+  "dataset": "fiqa",
+  "split": "test",
+  "method": "gpu_exact",
+  "spec": "gpu_exact",
+  "threads": null,
+  "n_queries": 648,
+  "top_k": 100,
+  "exact": "yes (float32, ~1e-6)",
+  "ndcg@10": 0.41411127409326626,
+  "recall@100": 0.7085479035710518,
+  "recall@10": 0.4946159464677984,
+  "metrics": {
+    "accuracy@1": 0.3966049382716049,
+    "accuracy@10": 0.7299382716049383,
+    "accuracy@100": 0.9012345679012346,
+    "precision@1": 0.3966049382716049,
+    "recall@1": 0.21680135279672316,
+    "precision@10": 0.10478395061728396,
+    "recall@10": 0.4946159464677984,
+    "precision@100": 0.01652777777777778,
+    "recall@100": 0.7085479035710518,
+    "ndcg@10": 0.41411127409326626,
+    "map@100": 0.34651599918145265
+  },
+  "latency": {
+    "mean_ms": 55.87517870368668,
+    "p50_ms": 55.4581500000495,
+    "p95_ms": 59.54610000208049,
+    "max_ms": 63.98230000195326,
+    "n_timed": 648
+  },
+  "index": {
+    "build_s": 3.6940178999975615,
+    "vram_mb": 3165.099416,
+    "batch": 1
+  },
+  "build_wall_s": 1.228598100002273,
+  "rss_gb": 5.65735424,
+  "peak_gb": 7.447486464,
+  "other_eval_procs": [],
+  "cpu": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+  "numba_threading_layer": "omp",
+  "tag": "fiqa"
+}

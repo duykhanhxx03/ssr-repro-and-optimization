@@ -1,0 +1,5 @@
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 7156.10it/s]
+[backbone-dense] fiqa/test: nDCG@10 graded = 13.67 (648 queries)
+[backbone-dense] fiqa/dev: nDCG@10 graded = 13.82 (500 queries)
+[backbone-dense] fiqa/train1k: nDCG@10 graded = 11.99 (1000 queries)
+[backbone-dense] fiqa: corpus encode+score 520s

@@ -1,0 +1,7 @@
+scifact:test docs=5183 queries=300 load=1.8s rss=1.20GB
+[fast_hyb t=1] nDCG@10=87.83 R@100=100.00 mean=52.93ms p50=46.65 p95=102.22 build=1.0672306000014942 rss=1.61GB
+[fast_hyb t=6] nDCG@10=87.83 R@100=100.00 mean=17.44ms p50=15.08 p95=34.69 build=1.0672306000014942 rss=1.64GB
+[fast_hyb t=12] nDCG@10=87.83 R@100=100.00 mean=12.79ms p50=10.38 p95=29.27 build=1.0672306000014942 rss=1.64GB
+[fast_ssrpp t=1] nDCG@10=87.83 R@100=99.67 mean=44.86ms p50=43.05 p95=62.47 build=1.0672306000014942 rss=1.64GB
+[fast_ssrpp t=6] nDCG@10=87.83 R@100=99.67 mean=14.50ms p50=14.01 p95=21.29 build=1.0672306000014942 rss=1.64GB
+[fast_ssrpp t=12] nDCG@10=87.83 R@100=99.67 mean=10.04ms p50=9.32 p95=16.50 build=1.0672306000014942 rss=1.64GB

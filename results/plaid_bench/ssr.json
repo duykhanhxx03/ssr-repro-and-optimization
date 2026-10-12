@@ -1,0 +1,61 @@
+{
+  "system": "SSR-tok",
+  "encode_s": 1294.056763862133,
+  "encode_s_note": "extrapolated from 5,000 docs",
+  "repo_index_build_s_cpu": 164.3266670703888,
+  "repo_index_bytes": 2583261048,
+  "n_postings": 258319692,
+  "opt_index_build_s_cpu": 2.9190855026245117,
+  "opt_index_bytes": {
+    "forward": 1566775608,
+    "mu": 466483240,
+    "token_postings": 2217284968
+  },
+  "opt_threads": 12,
+  "test_opt_exact_cpu": {
+    "ndcg@10": 41.41112740932663,
+    "mean_ms": 58.98919938271668,
+    "p50_ms": 56.630450002558064,
+    "p95_ms": 93.17228999898359,
+    "n_queries": 648
+  },
+  "test_opt_lbrerank_t8_1000_cpu": {
+    "ndcg@10": 41.41112740932663,
+    "mean_ms": 36.74642700629372,
+    "p50_ms": 35.44540000075358,
+    "p95_ms": 57.40859499819634,
+    "n_queries": 648
+  },
+  "test_exact_gpu": {
+    "ndcg@10": 41.41112740932663,
+    "mean_ms": 123.73823364196366,
+    "p50_ms": 55.890349998662714,
+    "p95_ms": 798.9375749995816,
+    "n_queries": 648
+  },
+  "dev_opt_exact_cpu": {
+    "ndcg@10": 22.80033518244283,
+    "mean_ms": 56.69090520021564,
+    "p50_ms": 54.83340000137105,
+    "p95_ms": 89.18592500194791,
+    "n_queries": 500
+  },
+  "dev_opt_lbrerank_t8_1000_cpu": {
+    "ndcg@10": 22.805747680187817,
+    "mean_ms": 35.97803340006794,
+    "p50_ms": 34.81045000080485,
+    "p95_ms": 58.088335002321394,
+    "n_queries": 500
+  },
+  "dev_exact_gpu": {
+    "ndcg@10": 22.80033518244283,
+    "mean_ms": 144.0050188001187,
+    "p50_ms": 55.6256999989273,
+    "p95_ms": 813.3714900042833,
+    "n_queries": 500
+  },
+  "cpu_threads": 12,
+  "gpu": "NVIDIA GeForce RTX 5060",
+  "dataset": "fiqa",
+  "n_docs": 57638
+}

@@ -1,0 +1,50 @@
+{
+  "dataset": "scifact",
+  "split": "test",
+  "method": "repo_exact",
+  "spec": "repo_exact",
+  "threads": 1,
+  "n_queries": 300,
+  "top_k": 100,
+  "exact": "yes (reference)",
+  "ndcg@10": 0.8783362070743334,
+  "recall@100": 1.0,
+  "recall@10": 0.964,
+  "metrics": {
+    "accuracy@1": 0.79,
+    "accuracy@10": 0.9733333333333334,
+    "accuracy@100": 1.0,
+    "precision@1": 0.79,
+    "recall@1": 0.7569444444444445,
+    "precision@10": 0.10766666666666667,
+    "recall@10": 0.964,
+    "precision@100": 0.011300000000000001,
+    "recall@100": 1.0,
+    "ndcg@10": 0.8783362070743334,
+    "map@100": 0.848112603076747
+  },
+  "latency": null,
+  "index": {
+    "build_s": 8.368008600000394
+  },
+  "build_wall_s": 0.0022492999996757135,
+  "rss_gb": 1.232457728,
+  "peak_gb": 4.967477248,
+  "other_eval_procs": [],
+  "cpu": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+  "numba_threading_layer": "omp",
+  "tag": "small",
+  "wall_s": 114.45957029999954,
+  "repo_timing": {
+    "retrieval_index_seconds": 8.368008600000394,
+    "retrieval_score_seconds": 106.08658620000097,
+    "retrieval_wall_seconds": 114.45465730000069,
+    "retrieval_seconds_per_query": 0.35362195400000324,
+    "retrieval_score_seconds_per_query": 0.35362195400000324,
+    "retrieval_n_queries": 300.0,
+    "retrieval_n_index_builds": 2.0,
+    "retrieval_total_seconds": 114.45465730000069
+  },
+  "mean_ms_incl_index_build": 381.53190099999847,
+  "mean_ms_scoring_only": 353.6219540000032
+}

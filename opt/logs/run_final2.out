@@ -1,0 +1,13 @@
+fiqa:test docs=57638 queries=648 load=9.4s rss=3.05GB
+[fast_hyb t=1] nDCG@10=41.41 R@100=70.85 mean=320.36ms p50=318.49 p95=496.63 build=4.793766699996922 rss=5.14GB
+[fast_hyb t=6] nDCG@10=41.41 R@100=70.85 mean=82.33ms p50=81.58 p95=127.22 build=4.793766699996922 rss=5.21GB
+[fast_hyb t=12] nDCG@10=41.41 R@100=70.85 mean=54.40ms p50=53.01 p95=82.08 build=4.793766699996922 rss=5.29GB
+[fast_ssrpp t=1] nDCG@10=36.86 R@100=50.90 mean=59.53ms p50=59.26 p95=85.89 build=4.793766699996922 rss=5.29GB
+[fast_ssrpp t=6] nDCG@10=36.86 R@100=50.90 mean=18.56ms p50=18.24 p95=27.46 build=4.793766699996922 rss=5.29GB
+[fast_ssrpp t=12] nDCG@10=36.86 R@100=50.90 mean=11.74ms p50=11.40 p95=16.87 build=4.793766699996922 rss=5.30GB
+fiqa:test docs=57638 queries=648 load=9.4s rss=3.05GB
+[fast_lat t=6] nDCG@10=41.41 R@100=70.85 mean=119.80ms p50=115.34 p95=205.28 build=2.576528799996595 rss=5.21GB
+[fast_tok t=6] nDCG@10=41.41 R@100=70.85 mean=268.86ms p50=257.33 p95=499.30 build=2.576528799996595 rss=5.38GB
+[gpu_exact t=0] nDCG@10=41.41 R@100=70.85 mean=55.88ms p50=55.46 p95=59.55 build=3.6940178999975615 rss=5.66GB
+[gpu_exact-i321 t=0] nDCG@10=41.41 R@100=70.85 mean=52.10ms p50=50.42 p95=54.57 build=3.544884099996125 rss=6.33GB
+EXIT 0

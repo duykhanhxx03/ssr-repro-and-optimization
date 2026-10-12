@@ -1,0 +1,12 @@
+2026-10-11 20:02:34,058 [INFO] mode=exact+sparse-cache | encode=cuda | score=cuda | cuda_available=True | gpu_name=NVIDIA GeForce RTX 5060
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 9062.61it/s]
+2026-10-11 20:02:34,578 [INFO] Evaluation variant: SSR
+2026-10-11 20:02:34,579 [INFO] === Evaluating nfcorpus (NFCorpus) ===
+2026-10-11 20:02:34,579 [INFO] Metrics for nfcorpus: mrr@[] ndcg@[10]
+2026-10-11 20:02:34,606 [INFO] Loading cached corpus embeddings: D:\No-Kmeans-code-paper\repro\cache\A\nfcorpus\corpus_32k_test.npz
+2026-10-11 20:02:35,900 [INFO] Encoding queries (323) ...
+[run_eval] ignoring SAE config keys not supported by repo: {'center_inputs': False, 'l2_normalize_inputs': False}
+[run_eval] loaded D:\No-Kmeans-code-paper\repro\ckpt\SSR-tok: n_latents=16384 topk=32 token_scope=non-cls q_len=192 d_len=512 expansion=False vocab=30524 skiplist=32
+Encode queries:   0%|          | 0/41 [00:00<?, ?it/s]Encode queries:   2%|▏         | 1/41 [00:10<06:41, 10.04s/it]Encode queries:   7%|▋         | 3/41 [00:10<01:40,  2.64s/it]Encode queries:  20%|█▉        | 8/41 [00:10<00:24,  1.35it/s]Encode queries:  37%|███▋      | 15/41 [00:10<00:08,  3.20it/s]Encode queries:  51%|█████     | 21/41 [00:10<00:03,  5.31it/s]Encode queries:  66%|██████▌   | 27/41 [00:10<00:01,  8.05it/s]Encode queries:  80%|████████  | 33/41 [00:10<00:00, 11.50it/s]Encode queries:  95%|█████████▌| 39/41 [00:10<00:00, 15.61it/s]Encode queries: 100%|██████████| 41/41 [00:10<00:00,  3.78it/s]
+Exact retrieve [index-first, GPU candidates]:   0%|          | 0/1 [00:00<?, ?it/s]D:\No-Kmeans-code-paper\repro\SSR\ssr\retrieval\sparse_repr.py:217: UserWarning: Sparse invariant checks are implicitly disabled. Memory errors (e.g. SEGFAULT) will occur when operating on a sparse tensor which violates the invariants, but checks incur performance overhead. To silence this warning, explicitly opt in or out. See `torch.sparse.check_sparse_tensor_invariants.__doc__` for guidance.  (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\Context.cpp:767.)
+  return torch.sparse_coo_tensor(

@@ -1,0 +1,5 @@
+fiqa:test docs=57638 queries=648 load=9.4s rss=3.05GB
+[fast_lat t=6] nDCG@10=41.41 R@100=70.85 mean=119.80ms p50=115.34 p95=205.28 build=2.576528799996595 rss=5.21GB
+[fast_tok t=6] nDCG@10=41.41 R@100=70.85 mean=268.86ms p50=257.33 p95=499.30 build=2.576528799996595 rss=5.38GB
+[gpu_exact t=0] nDCG@10=41.41 R@100=70.85 mean=55.88ms p50=55.46 p95=59.55 build=3.6940178999975615 rss=5.66GB
+[gpu_exact-i321 t=0] nDCG@10=41.41 R@100=70.85 mean=52.10ms p50=50.42 p95=54.57 build=3.544884099996125 rss=6.33GB

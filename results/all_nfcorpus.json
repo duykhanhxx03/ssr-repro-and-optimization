@@ -1,0 +1,23 @@
+{
+  "nfcorpus": {
+    "accuracy@1": 0.6068111455108359,
+    "accuracy@10": 0.8513931888544891,
+    "accuracy@100": 0.9411764705882353,
+    "precision@1": 0.6068111455108359,
+    "recall@1": 0.09158616019112803,
+    "precision@10": 0.2643962848297214,
+    "recall@10": 0.22326134548485865,
+    "precision@100": 0.07229102167182663,
+    "recall@100": 0.36035472507758004,
+    "ndcg@10": 0.4080545879353933,
+    "map@100": 0.2099798244614919,
+    "retrieval_index_seconds": 48.663136599999234,
+    "retrieval_score_seconds": 18.192413300000226,
+    "retrieval_wall_seconds": 66.85596340000029,
+    "retrieval_seconds_per_query": 0.056323260990712776,
+    "retrieval_score_seconds_per_query": 0.056323260990712776,
+    "retrieval_n_queries": 323.0,
+    "retrieval_n_index_builds": 1.0,
+    "retrieval_total_seconds": 66.85596340000029
+  }
+}

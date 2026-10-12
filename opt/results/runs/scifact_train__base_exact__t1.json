@@ -1,0 +1,43 @@
+{
+  "dataset": "scifact",
+  "split": "train",
+  "method": "base_exact",
+  "spec": "base_exact",
+  "threads": 1,
+  "n_queries": 809,
+  "top_k": 100,
+  "exact": "yes (reference)",
+  "ndcg@10": 0.6939272566159073,
+  "recall@100": 0.9284095591264937,
+  "recall@10": 0.8012154923774206,
+  "metrics": {
+    "accuracy@1": 0.5945611866501854,
+    "accuracy@10": 0.8182941903584673,
+    "accuracy@100": 0.934487021013597,
+    "precision@1": 0.5945611866501854,
+    "recall@1": 0.5663782447466007,
+    "precision@10": 0.09011124845488258,
+    "recall@10": 0.8012154923774206,
+    "precision@100": 0.010506798516687269,
+    "recall@100": 0.9284095591264937,
+    "ndcg@10": 0.6939272566159073,
+    "map@100": 0.6597197342309158
+  },
+  "latency": {
+    "mean_ms": 364.21555228681666,
+    "p50_ms": 337.065599998823,
+    "p95_ms": 664.338279999356,
+    "max_ms": 1440.3056999999535,
+    "n_timed": 809
+  },
+  "index": {
+    "build_s": 10.675377399998979
+  },
+  "build_wall_s": 10.677997300001152,
+  "rss_gb": 1.93978368,
+  "peak_gb": 5.095227392,
+  "other_eval_procs": [],
+  "cpu": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+  "numba_threading_layer": "omp",
+  "tag": "small"
+}

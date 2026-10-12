@@ -1,0 +1,21 @@
+2026-10-11 21:38:26,102 [INFO] mode=pruned+sparse-cache | encode=cuda | score=cpu | cuda_available=True | gpu_name=NVIDIA GeForce RTX 5060
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 8637.40it/s]
+2026-10-11 21:38:26,627 [INFO] Evaluation variant: SSR++
+2026-10-11 21:38:26,628 [INFO] === Evaluating fiqa (FiQA2018) ===
+2026-10-11 21:38:26,628 [INFO] Metrics for fiqa: mrr@[] ndcg@[10]
+2026-10-11 21:38:26,847 [INFO] Loading cached corpus embeddings: D:\No-Kmeans-code-paper\repro\cache\fixed\fiqa\corpus_32k_test.npz
+2026-10-11 21:38:37,159 [INFO] Encoding queries (648) ...
+Encode queries:   0%|          | 0/81 [00:00<?, ?it/s]Encode queries:   1%|          | 1/81 [00:02<03:15,  2.44s/it]Encode queries:   9%|▊         | 7/81 [00:02<00:20,  3.66it/s]Encode queries:  15%|█▍        | 12/81 [00:02<00:09,  6.96it/s]Encode queries:  21%|██        | 17/81 [00:02<00:05, 10.78it/s]Encode queries:  27%|██▋       | 22/81 [00:02<00:03, 15.31it/s]Encode queries:  33%|███▎      | 27/81 [00:02<00:02, 20.02it/s]Encode queries:  40%|███▉      | 32/81 [00:03<00:01, 24.70it/s]Encode queries:  46%|████▌     | 37/81 [00:03<00:01, 29.39it/s]Encode queries:  53%|█████▎    | 43/81 [00:03<00:01, 34.37it/s]Encode queries:  59%|█████▉    | 48/81 [00:03<00:00, 37.24it/s]Encode queries:  65%|██████▌   | 53/81 [00:03<00:00, 39.79it/s]Encode queries:  72%|███████▏  | 58/81 [00:03<00:00, 40.97it/s]Encode queries:  78%|███████▊  | 63/81 [00:03<00:00, 34.66it/s]Encode queries:  84%|████████▍ | 68/81 [00:03<00:00, 38.03it/s]Encode queries:  90%|█████████ | 73/81 [00:04<00:00, 39.74it/s]Encode queries:  96%|█████████▋| 78/81 [00:04<00:00, 42.02it/s]Encode queries: 100%|██████████| 81/81 [00:04<00:00, 19.11it/s]
+SSR++ step 1 (coarse, chunked inverted index):   0%|          | 0/12 [00:00<?, ?it/s]SSR++ step 1 (coarse, chunked inverted index):   8%|▊         | 1/12 [00:13<02:29, 13.55s/it]SSR++ step 1 (coarse, chunked inverted index):  17%|█▋        | 2/12 [00:26<02:14, 13.41s/it]SSR++ step 1 (coarse, chunked inverted index):  25%|██▌       | 3/12 [00:39<01:59, 13.23s/it]SSR++ step 1 (coarse, chunked inverted index):  33%|███▎      | 4/12 [00:54<01:48, 13.62s/it]SSR++ step 1 (coarse, chunked inverted index):  42%|████▏     | 5/12 [01:07<01:34, 13.57s/it]SSR++ step 1 (coarse, chunked inverted index):  50%|█████     | 6/12 [01:23<01:26, 14.42s/it]SSR++ step 1 (coarse, chunked inverted index):  58%|█████▊    | 7/12 [01:38<01:12, 14.54s/it]SSR++ step 1 (coarse, chunked inverted index):  67%|██████▋   | 8/12 [01:53<00:58, 14.58s/it]SSR++ step 1 (coarse, chunked inverted index):  75%|███████▌  | 9/12 [02:06<00:42, 14.14s/it]SSR++ step 1 (coarse, chunked inverted index):  83%|████████▎ | 10/12 [02:19<00:27, 13.74s/it]SSR++ step 1 (coarse, chunked inverted index):  92%|█████████▏| 11/12 [02:31<00:13, 13.42s/it]SSR++ step 1 (coarse, chunked inverted index): 100%|██████████| 12/12 [02:38<00:00, 11.38s/it]SSR++ step 1 (coarse, chunked inverted index): 100%|██████████| 12/12 [02:38<00:00, 13.21s/it]
+2026-10-11 21:46:49,774 [INFO]   accuracy@1: 0.3735
+2026-10-11 21:46:49,774 [INFO]   accuracy@10: 0.6312
+2026-10-11 21:46:49,774 [INFO]   accuracy@100: 0.7207
+2026-10-11 21:46:49,774 [INFO]   map@100: 0.3070
+2026-10-11 21:46:49,774 [INFO]   ndcg@10: 0.3686
+2026-10-11 21:46:49,774 [INFO]   precision@1: 0.3735
+2026-10-11 21:46:49,774 [INFO]   precision@10: 0.0872
+2026-10-11 21:46:49,774 [INFO]   precision@100: 0.0113
+2026-10-11 21:46:49,774 [INFO]   recall@1: 0.2083
+2026-10-11 21:46:49,774 [INFO]   recall@10: 0.4201
+2026-10-11 21:46:49,774 [INFO]   recall@100: 0.5090
+2026-10-11 21:46:49,776 [INFO] Wrote metrics to results\fixed_fiqa_test_ssrpp.json

@@ -1,0 +1,13 @@
+WARNING: other eval processes running:
+  5492: D:\No-Kmeans-code-paper\repro\venv\Scripts\python.exe quora_ssr.py --dataset quora --splits test,dev --ignore-identical-ids
+  12304: D:\No-Kmeans-code-paper\repro\venv\Scripts\python.exe quora_ssr.py --dataset quora --splits test,dev --ignore-identical-ids
+fiqa:dev docs=57638 queries=500 load=10.2s rss=3.05GB
+[fast_hyb t=3] nDCG@10=22.80 R@100=51.38 mean=131.96ms p50=130.27 p95=206.48 build=4.469281499999852 rss=5.17GB
+[fast_ssrpp-kc4-n2000 t=3] nDCG@10=18.11 R@100=33.10 mean=50.53ms p50=51.19 p95=70.60 build=4.469281499999852 rss=5.17GB
+[fast_ssrpp-kc4-n5000 t=3] nDCG@10=20.60 R@100=42.20 mean=119.93ms p50=119.93 p95=173.05 build=4.469281499999852 rss=5.17GB
+[fast_ssrpp-kc4-n10000 t=3] nDCG@10=22.25 R@100=48.74 mean=210.77ms p50=214.98 p95=302.20 build=4.469281499999852 rss=5.17GB
+[fast_ssrpp-kc8-n2000 t=3] nDCG@10=18.01 R@100=33.53 mean=56.09ms p50=57.09 p95=78.18 build=4.469281499999852 rss=5.17GB
+[fast_ssrpp-kc8-n5000 t=3] nDCG@10=20.53 R@100=41.60 mean=122.80ms p50=125.21 p95=171.36 build=4.469281499999852 rss=5.17GB
+[fast_ssrpp-kc32-n2000 t=3] nDCG@10=16.30 R@100=29.83 mean=71.98ms p50=72.47 p95=101.68 build=4.469281499999852 rss=5.17GB
+[fast_ssrpp-kc32-n5000 t=3] nDCG@10=20.32 R@100=39.90 mean=130.52ms p50=131.83 p95=181.72 build=4.469281499999852 rss=5.10GB
+[fast_lb-t2-n1000 t=3] nDCG@10=18.82 R@100=34.92 mean=73.38ms p50=67.26 p95=123.03 build=4.469281499999852 rss=3.07GB

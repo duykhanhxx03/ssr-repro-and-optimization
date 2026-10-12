@@ -1,0 +1,3 @@
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 4424.23it/s]
+[ssr] encoded 522931 docs in 689s
+[ssr] index: 234766310 postings, built in 104s

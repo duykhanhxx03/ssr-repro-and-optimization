@@ -1,0 +1,21 @@
+2026-10-11 20:42:32,125 [INFO] mode=pruned+sparse-cache | encode=cuda | score=cpu | cuda_available=True | gpu_name=NVIDIA GeForce RTX 5060
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 8066.67it/s]
+2026-10-11 20:42:32,726 [INFO] Evaluation variant: SSR++
+2026-10-11 20:42:32,727 [INFO] === Evaluating nfcorpus (NFCorpus) ===
+2026-10-11 20:42:32,727 [INFO] Metrics for nfcorpus: mrr@[] ndcg@[10]
+2026-10-11 20:42:32,765 [INFO] Loading cached corpus embeddings: D:\No-Kmeans-code-paper\repro\cache\A\nfcorpus\corpus_32k_test.npz
+2026-10-11 20:42:34,171 [INFO] Encoding queries (323) ...
+Encode queries:   0%|          | 0/41 [00:00<?, ?it/s]Encode queries:   2%|▏         | 1/41 [00:00<00:38,  1.04it/s]Encode queries:  15%|█▍        | 6/41 [00:01<00:04,  7.22it/s]Encode queries:  22%|██▏       | 9/41 [00:01<00:03, 10.41it/s]Encode queries:  32%|███▏      | 13/41 [00:01<00:01, 15.49it/s]Encode queries:  41%|████▏     | 17/41 [00:01<00:01, 19.84it/s]Encode queries:  51%|█████     | 21/41 [00:01<00:00, 23.84it/s]Encode queries:  61%|██████    | 25/41 [00:01<00:00, 27.14it/s]Encode queries:  73%|███████▎  | 30/41 [00:01<00:00, 31.66it/s]Encode queries:  85%|████████▌ | 35/41 [00:01<00:00, 33.81it/s]Encode queries:  95%|█████████▌| 39/41 [00:01<00:00, 34.64it/s]Encode queries: 100%|██████████| 41/41 [00:02<00:00, 20.36it/s]
+SSR++ step 1 (coarse, chunked inverted index):   0%|          | 0/1 [00:00<?, ?it/s]SSR++ step 1 (coarse, chunked inverted index): 100%|██████████| 1/1 [00:20<00:00, 20.14s/it]SSR++ step 1 (coarse, chunked inverted index): 100%|██████████| 1/1 [00:20<00:00, 20.14s/it]
+2026-10-11 20:43:08,412 [INFO]   accuracy@1: 0.6378
+2026-10-11 20:43:08,412 [INFO]   accuracy@10: 0.8793
+2026-10-11 20:43:08,412 [INFO]   accuracy@100: 0.9505
+2026-10-11 20:43:08,412 [INFO]   map@100: 0.2227
+2026-10-11 20:43:08,412 [INFO]   ndcg@10: 0.4398
+2026-10-11 20:43:08,412 [INFO]   precision@1: 0.6378
+2026-10-11 20:43:08,412 [INFO]   precision@10: 0.2759
+2026-10-11 20:43:08,412 [INFO]   precision@100: 0.0747
+2026-10-11 20:43:08,412 [INFO]   recall@1: 0.0936
+2026-10-11 20:43:08,412 [INFO]   recall@10: 0.2371
+2026-10-11 20:43:08,412 [INFO]   recall@100: 0.3702
+2026-10-11 20:43:08,413 [INFO] Wrote metrics to results\fixed_nfcorpus_ssrpp.json

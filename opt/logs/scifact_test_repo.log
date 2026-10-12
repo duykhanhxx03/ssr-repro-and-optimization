@@ -1,0 +1,3 @@
+scifact:test docs=5183 queries=300 load=1.9s rss=1.20GB
+[repo_exact t=1] nDCG@10=87.83 R@100=100.00 mean(batch,incl build)=381.5ms build=8.368008600000394 rss=1.23GB
+[repo_ssrpp t=1] nDCG@10=87.83 R@100=99.67 mean(batch,incl build)=282.0ms build=None rss=1.30GB

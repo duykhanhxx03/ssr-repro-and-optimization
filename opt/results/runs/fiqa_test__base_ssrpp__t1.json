@@ -1,0 +1,44 @@
+{
+  "dataset": "fiqa",
+  "split": "test",
+  "method": "base_ssrpp",
+  "spec": "base_ssrpp",
+  "threads": 1,
+  "n_queries": 100,
+  "top_k": 100,
+  "exact": "no (SSR++)",
+  "ndcg@10": 0.3757661752957726,
+  "recall@100": 0.5201666666666667,
+  "recall@10": 0.4635,
+  "metrics": {
+    "accuracy@1": 0.33,
+    "accuracy@10": 0.6,
+    "accuracy@100": 0.67,
+    "precision@1": 0.33,
+    "recall@1": 0.22466666666666665,
+    "precision@10": 0.079,
+    "recall@10": 0.4635,
+    "precision@100": 0.0094,
+    "recall@100": 0.5201666666666667,
+    "ndcg@10": 0.3757661752957726,
+    "map@100": 0.31741723563820967
+  },
+  "latency": {
+    "mean_ms": 478.6029729998336,
+    "p50_ms": 426.7116499995609,
+    "p95_ms": 854.6855650012731,
+    "max_ms": 1231.7255999987538,
+    "n_timed": 100
+  },
+  "index": {
+    "build_s": 173.64119829999981,
+    "mu_build_s": 107.4621815999999
+  },
+  "build_wall_s": 107.46221040000091,
+  "rss_gb": 7.25508096,
+  "peak_gb": 24.44793856,
+  "other_eval_procs": [],
+  "cpu": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+  "numba_threading_layer": "omp",
+  "tag": "fiqa100"
+}

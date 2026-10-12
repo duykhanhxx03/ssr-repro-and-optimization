@@ -1,0 +1,23 @@
+{
+  "scifact": {
+    "accuracy@1": 0.03333333333333333,
+    "accuracy@10": 0.14,
+    "accuracy@100": 0.47333333333333333,
+    "precision@1": 0.03333333333333333,
+    "recall@1": 0.03333333333333333,
+    "precision@10": 0.014333333333333333,
+    "recall@10": 0.13333333333333333,
+    "precision@100": 0.005166666666666667,
+    "recall@100": 0.45877777777777773,
+    "ndcg@10": 0.07463445412783219,
+    "map@100": 0.06795551055720316,
+    "retrieval_index_seconds": 69.97843310000007,
+    "retrieval_score_seconds": 6.615562599999976,
+    "retrieval_wall_seconds": 76.59463920000053,
+    "retrieval_seconds_per_query": 0.022051875333333252,
+    "retrieval_score_seconds_per_query": 0.022051875333333252,
+    "retrieval_n_queries": 300.0,
+    "retrieval_n_index_builds": 2.0,
+    "retrieval_total_seconds": 76.59463920000053
+  }
+}

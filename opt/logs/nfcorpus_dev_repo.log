@@ -1,0 +1,3 @@
+nfcorpus:dev docs=3633 queries=324 load=1.3s rss=1.09GB
+[repo_exact t=1] nDCG@10=27.41 R@100=26.18 mean(batch,incl build)=59.3ms build=5.387051899999278 rss=1.13GB
+[repo_ssrpp t=1] nDCG@10=27.39 R@100=25.95 mean(batch,incl build)=86.1ms build=None rss=1.15GB

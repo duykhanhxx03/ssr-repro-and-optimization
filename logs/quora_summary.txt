@@ -1,0 +1,6 @@
+SSR exit=127
+[ssr] encoded 522931 docs in 689s
+[ssr] index: 234766310 postings, built in 104s
+ColBERTv2 exit=0
+[dense] lightonai/colbertv2.0 quora/test: nDCG@10 binary = 85.67, graded = 85.67 (10000 queries)
+[dense] lightonai/colbertv2.0 quora/dev: nDCG@10 binary = 85.25, graded = 85.25 (5000 queries)

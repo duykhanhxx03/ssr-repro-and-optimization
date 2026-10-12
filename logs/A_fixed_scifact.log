@@ -1,0 +1,32 @@
+2026-10-11 20:40:09,515 [INFO] mode=exact+sparse-cache | encode=cuda | score=index | cuda_available=True | gpu_name=NVIDIA GeForce RTX 5060
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 8533.55it/s]
+2026-10-11 20:40:10,050 [INFO] Evaluation variant: SSR
+2026-10-11 20:40:10,051 [INFO] === Evaluating scifact (SciFact) ===
+2026-10-11 20:40:10,051 [INFO] Metrics for scifact: mrr@[] ndcg@[10]
+2026-10-11 20:40:10,081 [INFO] Loading cached corpus embeddings: D:\No-Kmeans-code-paper\repro\cache\A\scifact\corpus_32k_test.npz
+2026-10-11 20:40:11,962 [INFO] Encoding queries (300) ...
+[run_eval] ignoring SAE config keys not supported by repo: {'center_inputs': False, 'l2_normalize_inputs': False}
+[run_eval] loaded D:\No-Kmeans-code-paper\repro\ckpt\SSR-tok: n_latents=16384 topk=32 token_scope=non-cls q_len=192 d_len=512 expansion=False vocab=30524 skiplist=32
+Encode queries:   0%|          | 0/38 [00:00<?, ?it/s]Encode queries:   3%|▎         | 1/38 [00:00<00:28,  1.31it/s]Encode queries:  13%|█▎        | 5/38 [00:00<00:04,  7.40it/s]Encode queries:  26%|██▋       | 10/38 [00:00<00:01, 14.89it/s]Encode queries:  37%|███▋      | 14/38 [00:01<00:01, 19.85it/s]Encode queries:  50%|█████     | 19/38 [00:01<00:00, 25.51it/s]Encode queries:  63%|██████▎   | 24/38 [00:01<00:00, 30.10it/s]Encode queries:  76%|███████▋  | 29/38 [00:01<00:00, 33.39it/s]Encode queries:  89%|████████▉ | 34/38 [00:01<00:00, 36.52it/s]Encode queries: 100%|██████████| 38/38 [00:01<00:00, 23.35it/s]
+Exact retrieve [index-first, CPU index]:   0%|          | 0/2 [00:00<?, ?it/s]Exact retrieve [index-first, CPU index]:  50%|█████     | 1/2 [01:52<01:52, 112.17s/it]Exact retrieve [index-first, CPU index]: 100%|██████████| 2/2 [01:54<00:00, 47.27s/it] Exact retrieve [index-first, CPU index]: 100%|██████████| 2/2 [01:54<00:00, 57.00s/it]
+2026-10-11 20:42:07,608 [INFO] Retrieval timing [scifact]: index_build=9.394s (2 shard-ingests) | retrieve_score=104.613s | wall=114.008s | per-query_score=0.3487s (n_queries=300)
+2026-10-11 20:42:07,663 [INFO]   accuracy@1: 0.7900
+2026-10-11 20:42:07,663 [INFO]   accuracy@10: 0.9733
+2026-10-11 20:42:07,663 [INFO]   accuracy@100: 1.0000
+2026-10-11 20:42:07,663 [INFO]   map@100: 0.8481
+2026-10-11 20:42:07,663 [INFO]   ndcg@10: 0.8783
+2026-10-11 20:42:07,663 [INFO]   precision@1: 0.7900
+2026-10-11 20:42:07,663 [INFO]   precision@10: 0.1077
+2026-10-11 20:42:07,663 [INFO]   precision@100: 0.0113
+2026-10-11 20:42:07,663 [INFO]   recall@1: 0.7569
+2026-10-11 20:42:07,663 [INFO]   recall@10: 0.9640
+2026-10-11 20:42:07,663 [INFO]   recall@100: 1.0000
+2026-10-11 20:42:07,663 [INFO]   retrieval_index_seconds: 9.3943
+2026-10-11 20:42:07,663 [INFO]   retrieval_n_index_builds: 2.0000
+2026-10-11 20:42:07,663 [INFO]   retrieval_n_queries: 300.0000
+2026-10-11 20:42:07,664 [INFO]   retrieval_score_seconds: 104.6131
+2026-10-11 20:42:07,664 [INFO]   retrieval_score_seconds_per_query: 0.3487
+2026-10-11 20:42:07,664 [INFO]   retrieval_seconds_per_query: 0.3487
+2026-10-11 20:42:07,664 [INFO]   retrieval_total_seconds: 114.0080
+2026-10-11 20:42:07,664 [INFO]   retrieval_wall_seconds: 114.0080
+2026-10-11 20:42:07,664 [INFO] Wrote metrics to results\A_fixed_scifact.json

@@ -1,0 +1,21 @@
+2026-10-11 20:43:16,969 [INFO] mode=pruned+sparse-cache | encode=cuda | score=cpu | cuda_available=True | gpu_name=NVIDIA GeForce RTX 5060
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 7793.77it/s]
+2026-10-11 20:43:17,650 [INFO] Evaluation variant: SSR++
+2026-10-11 20:43:17,651 [INFO] === Evaluating scifact (SciFact) ===
+2026-10-11 20:43:17,651 [INFO] Metrics for scifact: mrr@[] ndcg@[10]
+2026-10-11 20:43:17,691 [INFO] Loading cached corpus embeddings: D:\No-Kmeans-code-paper\repro\cache\A\scifact\corpus_32k_test.npz
+2026-10-11 20:43:19,768 [INFO] Encoding queries (300) ...
+Encode queries:   0%|          | 0/38 [00:00<?, ?it/s]Encode queries:   3%|▎         | 1/38 [00:00<00:30,  1.20it/s]Encode queries:  13%|█▎        | 5/38 [00:00<00:04,  6.74it/s]Encode queries:  21%|██        | 8/38 [00:01<00:02, 10.19it/s]Encode queries:  32%|███▏      | 12/38 [00:01<00:01, 15.08it/s]Encode queries:  42%|████▏     | 16/38 [00:01<00:01, 19.15it/s]Encode queries:  50%|█████     | 19/38 [00:01<00:00, 21.40it/s]Encode queries:  61%|██████    | 23/38 [00:01<00:00, 25.39it/s]Encode queries:  71%|███████   | 27/38 [00:01<00:00, 27.75it/s]Encode queries:  82%|████████▏ | 31/38 [00:01<00:00, 29.81it/s]Encode queries:  92%|█████████▏| 35/38 [00:01<00:00, 30.16it/s]Encode queries: 100%|██████████| 38/38 [00:01<00:00, 19.23it/s]
+SSR++ step 1 (coarse, chunked inverted index):   0%|          | 0/2 [00:00<?, ?it/s]SSR++ step 1 (coarse, chunked inverted index):  50%|█████     | 1/2 [00:30<00:30, 30.41s/it]SSR++ step 1 (coarse, chunked inverted index): 100%|██████████| 2/2 [00:31<00:00, 12.89s/it]SSR++ step 1 (coarse, chunked inverted index): 100%|██████████| 2/2 [00:31<00:00, 15.52s/it]
+2026-10-11 20:44:55,142 [INFO]   accuracy@1: 0.7900
+2026-10-11 20:44:55,142 [INFO]   accuracy@10: 0.9733
+2026-10-11 20:44:55,142 [INFO]   accuracy@100: 0.9967
+2026-10-11 20:44:55,142 [INFO]   map@100: 0.8480
+2026-10-11 20:44:55,142 [INFO]   ndcg@10: 0.8783
+2026-10-11 20:44:55,142 [INFO]   precision@1: 0.7900
+2026-10-11 20:44:55,142 [INFO]   precision@10: 0.1077
+2026-10-11 20:44:55,142 [INFO]   precision@100: 0.0113
+2026-10-11 20:44:55,142 [INFO]   recall@1: 0.7569
+2026-10-11 20:44:55,142 [INFO]   recall@10: 0.9640
+2026-10-11 20:44:55,142 [INFO]   recall@100: 0.9967
+2026-10-11 20:44:55,143 [INFO] Wrote metrics to results\fixed_scifact_ssrpp.json

@@ -1,0 +1,1599 @@
+diff --git a/ssr/dataset.py b/ssr/dataset.py
+index 9e8e4ad..804446b 100644
+--- a/ssr/dataset.py
++++ b/ssr/dataset.py
+@@ -216,8 +216,14 @@ def _iter_triplet_rows(
+     corpus: CorpusLookup | None = None,
+     negative_rank: int = 0,
+     max_samples: int | None = None,
++    negatives_per_query: int = 1,
+ ) -> Iterator[dict[str, str]]:
+-    """Read query+positive+negative from hard_negatives/{split}.jsonl."""
++    """Read query+positive+negative from hard_negatives/{split}.jsonl.
++
++    ``negatives_per_query`` > 1 emits one consecutive triplet per hard negative
++    (ranks ``negative_rank`` .. ``negative_rank + n - 1``), as in the authors' setup of
++    32 triplets per query (GitHub issue #1); see ``ssr.samplers.QueryGroupedBatchSampler``.
++    """
+     count = 0
+     for row in _iter_jsonl(hard_negatives_path):
+         qid = str(row.get("qid", ""))
+@@ -228,20 +234,22 @@ def _iter_triplet_rows(
+             continue
+ 
+         positive_text = _doc_text(positives[0], corpus)
+-        rank = min(negative_rank, len(negatives) - 1)
+-        negative_text = _doc_text(negatives[rank], corpus)
+-        if not positive_text or not negative_text:
++        if not positive_text:
+             continue
+-
+-        yield {
+-            "qid": qid,
+-            "query": query,
+-            "positive": positive_text,
+-            "negative": negative_text,
+-        }
+-        count += 1
+-        if max_samples is not None and count >= max_samples:
+-            return
++        first = min(negative_rank, len(negatives) - 1)
++        for rank in range(first, min(first + max(1, negatives_per_query), len(negatives))):
++            negative_text = _doc_text(negatives[rank], corpus)
++            if not negative_text:
++                continue
++            yield {
++                "qid": qid,
++                "query": query,
++                "positive": positive_text,
++                "negative": negative_text,
++            }
++            count += 1
++            if max_samples is not None and count >= max_samples:
++                return
+ 
+ 
+ def _load_split_dataset(
+@@ -251,6 +259,7 @@ def _load_split_dataset(
+     sample_format: SampleFormat,
+     negative_rank: int = 0,
+     max_samples: int | None = None,
++    negatives_per_query: int = 1,
+ ) -> Dataset:
+     corpus: CorpusLookup | None = None
+     if sample_format == "pair":
+@@ -283,6 +292,7 @@ def _load_split_dataset(
+             corpus=corpus,
+             negative_rank=negative_rank,
+             max_samples=max_samples,
++            negatives_per_query=negatives_per_query,
+         )
+         label = "triplet"
+ 
+@@ -305,6 +315,7 @@ def load_msmarco_passage_datasets(
+     negative_rank: int = 0,
+     max_train_samples: int | None = None,
+     max_eval_samples: int | None = None,
++    negatives_per_query: int = 1,
+ ) -> tuple[Dataset, Dataset]:
+     """Load train/eval datasets from prepare_msmarco.py outputs."""
+     paths = MSMarcoPassagePaths.from_dir(data_dir)
+@@ -316,6 +327,7 @@ def load_msmarco_passage_datasets(
+         sample_format=sample_format,
+         negative_rank=negative_rank,
+         max_samples=max_train_samples,
++        negatives_per_query=negatives_per_query,
+     )
+     eval_dataset = _load_split_dataset(
+         paths,
+diff --git a/ssr/losses.py b/ssr/losses.py
+index 0376490..56eaa11 100644
+--- a/ssr/losses.py
++++ b/ssr/losses.py
+@@ -36,12 +36,14 @@ class LossWeights:
+     auxk: float = 0.1
+     ucl: float = 0.0
+     maxsim: float = 0.0
++    # Paper Eq. 7: L_recon(k) + 1/8 * L_recon(4k) + alpha * L_aux + beta * L_cl.
++    recon_4k: float = 0.125
+ 
+     def any_sae_loss(self) -> bool:
+-        return self.recon > 0.0 or self.auxk > 0.0
++        return self.recon > 0.0 or self.auxk > 0.0 or self.recon_4k > 0.0
+ 
+     def any_active(self) -> bool:
+-        return self.recon > 0.0 or self.auxk > 0.0 or self.ucl > 0.0 or self.maxsim > 0.0
++        return self.any_sae_loss() or self.ucl > 0.0 or self.maxsim > 0.0
+ 
+ 
+ def pool_sparse_latents(
+@@ -103,6 +105,7 @@ def compute_sae_loss_components(
+     *,
+     need_recon: bool = True,
+     need_auxk: bool = True,
++    need_recon_4k: bool = False,
+ ) -> dict[str, Tensor]:
+     """Return unweighted SAE loss components; skip terms that are not needed."""
+     device = (
+@@ -112,9 +115,10 @@ def compute_sae_loss_components(
+     )
+     zero = torch.tensor(0.0, device=device)
+ 
+-    if sae_aux is None or (not need_recon and not need_auxk):
++    if sae_aux is None or (not need_recon and not need_auxk and not need_recon_4k):
+         return {
+             "reconstruction": zero,
++            "reconstruction_4k": zero,
+             "auxk": zero,
+         }
+ 
+@@ -125,6 +129,10 @@ def compute_sae_loss_components(
+     if need_recon:
+         reconstruction = criterion(x, sae_aux["recons_k"])
+ 
++    reconstruction_4k = zero
++    if need_recon_4k and sae_aux.get("recons_4k") is not None:
++        reconstruction_4k = criterion(x, sae_aux["recons_4k"])
++
+     auxk = zero
+     if need_auxk and sae_aux["recons_aux"] is not None:
+         residual = x - sae_aux["recons_k"].detach() + sae_aux["pre_bias"].detach()
+@@ -132,6 +140,7 @@ def compute_sae_loss_components(
+ 
+     return {
+         "reconstruction": reconstruction,
++        "reconstruction_4k": reconstruction_4k,
+         "auxk": auxk,
+     }
+ 
+@@ -141,14 +150,20 @@ def compute_sae_loss(
+     *,
+     recon_coef: float = 1.0,
+     auxk_coef: float = 0.1,
++    recon_4k_coef: float = 0.125,
+ ) -> Tensor:
+     """Compute weighted SAE loss from module outputs."""
+     parts = compute_sae_loss_components(
+         sae_aux,
+         need_recon=recon_coef > 0.0,
+         need_auxk=auxk_coef > 0.0,
++        need_recon_4k=recon_4k_coef > 0.0,
++    )
++    return (
++        recon_coef * parts["reconstruction"]
++        + recon_4k_coef * parts["reconstruction_4k"]
++        + auxk_coef * parts["auxk"]
+     )
+-    return recon_coef * parts["reconstruction"] + auxk_coef * parts["auxk"]
+ 
+ 
+ def _aggregate_sae_losses(
+@@ -160,20 +175,25 @@ def _aggregate_sae_losses(
+ 
+     need_recon = weights.recon > 0.0
+     need_auxk = weights.auxk > 0.0
++    need_recon_4k = weights.recon_4k > 0.0
+     sae_parts = [
+         compute_sae_loss_components(
+             out.get("sae_aux"),
+             need_recon=need_recon,
+             need_auxk=need_auxk,
++            need_recon_4k=need_recon_4k,
+         )
+         for out in outputs
+     ]
+     mean_recon = torch.stack([part["reconstruction"] for part in sae_parts]).mean()
++    mean_recon_4k = torch.stack([part["reconstruction_4k"] for part in sae_parts]).mean()
+     mean_auxk = torch.stack([part["auxk"] for part in sae_parts]).mean()
+ 
+     losses: dict[str, Tensor] = {}
+     if need_recon:
+         losses["reconstruction"] = weights.recon * mean_recon
++    if need_recon_4k:
++        losses["reconstruction_4k"] = weights.recon_4k * mean_recon_4k
+     if need_auxk:
+         losses["auxk"] = weights.auxk * mean_auxk
+     return losses
+@@ -349,10 +369,11 @@ class SAEWithUnsupervisedCL(CombinedSAELoss):
+         auxk_coef: float = 0.1,
+         loss_4k_coef: float = 0.125,
+     ) -> None:
+-        del loss_4k_coef  # 4x-K term merged into single reconstruction coefficient
+         super().__init__(
+             model,
+-            LossWeights(recon=sae_coef, auxk=auxk_coef, ucl=cl_coef, maxsim=0.0),
++            LossWeights(
++                recon=sae_coef, auxk=auxk_coef, ucl=cl_coef, maxsim=0.0, recon_4k=loss_4k_coef
++            ),
+             ucl_temperature=cl_temperature,
+             gather_across_devices=gather_across_devices,
+         )
+@@ -374,10 +395,11 @@ class ContrastiveWithSAE(CombinedSAELoss):
+         auxk_coef: float = 0.1,
+         loss_4k_coef: float = 0.125,
+     ) -> None:
+-        del loss_4k_coef
+         super().__init__(
+             model,
+-            LossWeights(recon=sae_coef, auxk=auxk_coef, ucl=0.0, maxsim=1.0),
++            LossWeights(
++                recon=sae_coef, auxk=auxk_coef, ucl=0.0, maxsim=1.0, recon_4k=loss_4k_coef
++            ),
+             maxsim_temperature=temperature,
+             score_metric=score_metric,
+             score_mini_batch_size=score_mini_batch_size,
+diff --git a/ssr/model.py b/ssr/model.py
+index 992e939..3d2b43f 100644
+--- a/ssr/model.py
++++ b/ssr/model.py
+@@ -15,7 +15,7 @@ from .sparse_autoencoder import SparseAutoencoder
+ 
+ logger = logging.getLogger(__name__)
+ 
+-__all__ = ["SSR", "build_ssr"]
++__all__ = ["SSR", "build_ssr", "load_ssr_checkpoint"]
+ 
+ 
+ class SSR(ColBERT):
+@@ -236,6 +236,57 @@ class SSR(ColBERT):
+             self.sae_module.cls_token_id = self.tokenizer.cls_token_id
+ 
+ 
++def load_ssr_checkpoint(
++    model_path: str,
++    *,
++    device: str | None = None,
++    token_scope: str | None = None,
++) -> SSR:
++    """Load a saved SSR checkpoint (Transformer + trained SparseAutoencoder).
++
++    ``SSR(model_name_or_path=...)`` builds a *fresh* SAE (random weights, 4*hidden
++    latents) and ignores ``config_sentence_transformers.json``; this loader restores
++    the trained SAE from the module listed in ``modules.json`` and the ColBERT settings
++    (prefixes, query/document length, query expansion, skiplist) saved with it.
++    """
++    import json
++    from pathlib import Path
++
++    root = Path(model_path)
++    modules = json.loads((root / "modules.json").read_text(encoding="utf-8"))
++    sae_dir = next(
++        (m["path"] for m in modules if m["type"].endswith("SparseAutoencoder")),
++        "1_SparseAutoencoder",
++    )
++    transformer = Transformer(str(root))
++    sae = SparseAutoencoder.load(str(root), subfolder=sae_dir)
++    sae_cfg = json.loads((root / sae_dir / "config.json").read_text(encoding="utf-8"))
++    if token_scope is not None:
++        sae.token_scope = token_scope
++    elif "token_scope" not in sae_cfg:
++        # Token-level SSR SAEs are trained on non-[CLS] tokens (docs/training.md).
++        sae.token_scope = "non-cls"
++
++    st_cfg_path = root / "config_sentence_transformers.json"
++    st_cfg = json.loads(st_cfg_path.read_text(encoding="utf-8")) if st_cfg_path.is_file() else {}
++    keys = (
++        "query_prefix",
++        "document_prefix",
++        "query_length",
++        "document_length",
++        "do_query_expansion",
++        "attend_to_expansion_tokens",
++        "skiplist_words",
++    )
++    model = SSR(
++        modules=[transformer, sae],
++        device=device,
++        **{k: st_cfg[k] for k in keys if k in st_cfg},
++    )
++    model.eval()
++    return model
++
++
+ def build_ssr(
+     model_name_or_path: str,
+     *,
+diff --git a/ssr/retrieval/eval_mteb.py b/ssr/retrieval/eval_mteb.py
+index 109279c..243627a 100644
+--- a/ssr/retrieval/eval_mteb.py
++++ b/ssr/retrieval/eval_mteb.py
+@@ -19,7 +19,7 @@ if str(_PROJECT_ROOT) not in sys.path:
+     sys.path.insert(0, str(_PROJECT_ROOT))
+ 
+ from prepare_mteb_eval import MTEB_EVAL_DATASETS  # noqa: E402
+-from ssr.model import SSR  # noqa: E402
++from ssr.model import SSR, load_ssr_checkpoint  # noqa: E402
+ 
+ from .device_utils import describe_hardware, resolve_encode_device, resolve_score_device
+ from .cls_sae import CLSSparseEncoder
+@@ -53,10 +53,9 @@ def resolve_per_slug_index_cache_dir(base: Path, slug: str, *, multi_dataset: bo
+     return base / slug
+ 
+ 
+-def load_ssr(model_path: Path, device: str) -> SSR:
+-    model = SSR(model_name_or_path=str(model_path), device=device)
+-    model.eval()
+-    return model
++def load_ssr(model_path: Path, device: str, token_scope: str | None = None) -> SSR:
++    # SSR(model_name_or_path=...) would attach a randomly initialised SAE.
++    return load_ssr_checkpoint(str(model_path), device=device, token_scope=token_scope)
+ 
+ 
+ def cache_suffix(model, cls_encoder: CLSSparseEncoder | None = None) -> str:
+@@ -340,7 +339,7 @@ def evaluate_split_e2e(
+             f"(expected global_index_v2_bs{block_size}_{latent_reorder}/doc_id_map.json). "
+             "Run with --task index first."
+         )
+-    index, _latent_remap, stats, id_map = loaded
++    index, latent_remap, stats, id_map = loaded
+     corpus_ids = id_map.external_ids
+     if len(corpus_ids) != len(split.corpus_ids):
+         logger.warning(
+@@ -362,6 +361,12 @@ def evaluate_split_e2e(
+         device=encode_device,
+         cls_encoder=cls_encoder,
+     )
++    if latent_remap is not None:
++        # The index stores reordered latent ids (--latent-reorder); queries must use
++        # the same ids or they barely overlap with the postings.
++        from .global_index import remap_sparse_embeddings
++
++        queries_sparse = [remap_sparse_embeddings(q, latent_remap) for q in queries_sparse]
+ 
+     ranked = retriever.retrieve_from_e2e_index(
+         queries=queries_sparse,
+@@ -400,7 +405,7 @@ def run_mteb_index_build(args: argparse.Namespace) -> Dict[str, Any]:
+             retrieval_mode="e2e-index-build",
+         )
+     )
+-    model = load_ssr(model_path, encode_device)
++    model = load_ssr(model_path, encode_device, args.sae_token_scope)
+     cls_encoder = load_cls_encoder_from_args(args, device=encode_device)
+     logger.info("Index variant: %s", method_name(args))
+ 
+@@ -669,8 +674,10 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
+     )
+     parser.add_argument("--no-fine-rerank", action="store_true")
+     parser.add_argument("--corpus-chunk-size", type=int, default=5000)
+-    parser.add_argument("--block-size", type=int, default=512)
+-    parser.add_argument("--prune-topk", type=int, default=8)
++    # SSR++ defaults follow paper App. D.1: blocks of 64, top-4 coarse neurons,
++    # top-2000 candidates, exact refinement with the full K.
++    parser.add_argument("--block-size", type=int, default=64)
++    parser.add_argument("--prune-topk", type=int, default=4)
+     parser.add_argument("--n-candidates", type=int, default=2000)
+     parser.add_argument("--encode-batch-size", type=int, default=8)
+     parser.add_argument("--query-batch-size", type=int, default=16)
+@@ -734,8 +741,8 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
+         action="store_true",
+         help="[exact+e2e-index] Coarse postings + candidate-pool exact MaxSim.",
+     )
+-    parser.add_argument("--two-phase-pool-size", type=int, default=32_768)
+-    parser.add_argument("--coarse-topk", type=int, default=8)
++    parser.add_argument("--two-phase-pool-size", type=int, default=2000)
++    parser.add_argument("--coarse-topk", type=int, default=4)
+     parser.add_argument(
+         "--index-accum-device",
+         choices=("cpu", "cuda", "auto", "hybrid"),
+@@ -761,6 +768,12 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
+         default=None,
+         help="Top-K for --cls-sae-path (default: CLS SAE checkpoint topk).",
+     )
++    parser.add_argument(
++        "--sae-token-scope",
++        choices=("all", "non-cls"),
++        default=None,
++        help="Override the token SAE scope (default: checkpoint config, else non-cls).",
++    )
+     parser.add_argument("-v", "--verbose", action="store_true")
+     return parser.parse_args(argv)
+ 
+@@ -811,7 +824,7 @@ def run_mteb_eval(args: argparse.Namespace) -> Dict[str, Any]:
+     )
+ 
+     model_path = resolve_model_checkpoint(args.model_path)
+-    model = load_ssr(model_path, encode_device)
++    model = load_ssr(model_path, encode_device, args.sae_token_scope)
+     cls_encoder = load_cls_encoder_from_args(args, device=encode_device)
+     retriever = build_retriever(_retriever_config_from_args(args, score_backend))
+     logger.info("Evaluation variant: %s", method_name(args))
+diff --git a/ssr/retrieval/inverted_index.py b/ssr/retrieval/inverted_index.py
+index cab6dd2..72cb46f 100644
+--- a/ssr/retrieval/inverted_index.py
++++ b/ssr/retrieval/inverted_index.py
+@@ -11,10 +11,8 @@ import torch
+ 
+ from .compact_postings import (
+     CompactPostings,
+-    Posting,
+     build_doc_latent_max,
+     compact_from_latent_major_coo,
+-    postings_dict_to_compact,
+     query_latent_weight_sums,
+     segment_max_by_doc,
+ )
+@@ -104,21 +102,32 @@ class BlockInvertedIndex:
+         sort_postings: bool = True,
+     ) -> None:
+         del sort_postings  # compact layout is always sorted per latent
++        # Vectorised per document (one Python Posting object per nonzero does not fit
++        # in RAM beyond a few 10^7 postings). Same postings, same (latent, doc, token) order.
+         self.n_docs = len(corpus)
+-        postings: Dict[int, List[Posting]] = {}
++        lat_parts, doc_parts, tok_parts, val_parts = [], [], [], []
+         for doc_idx, sparse in enumerate(corpus):
+-            for t in range(sparse.n_tokens):
+-                for j in range(sparse.k):
+-                    latent = int(sparse.indices[t, j])
+-                    if latent < 0:
+-                        break
+-                    val = float(sparse.values[t, j])
+-                    if val <= 0.0:
+-                        continue
+-                    postings.setdefault(latent, []).append(
+-                        Posting(doc_idx=doc_idx, token_idx=t, value=val)
+-                    )
+-        self.compact = postings_dict_to_compact(postings)
++            if sparse.n_tokens == 0 or sparse.k == 0:
++                continue
++            ind = np.asarray(sparse.indices)
++            val = np.asarray(sparse.values, dtype=np.float32)
++            keep = (ind >= 0) & (val > 0.0)
++            tok, _ = np.nonzero(keep)
++            lat_parts.append(ind[keep].astype(np.int64))
++            val_parts.append(val[keep])
++            tok_parts.append(tok.astype(np.int64))
++            doc_parts.append(np.full(tok.shape[0], doc_idx, dtype=np.int64))
++        if not lat_parts:
++            self.compact = CompactPostings.empty()
++        else:
++            lat = np.concatenate(lat_parts)
++            order = np.argsort(lat, kind="stable")
++            self.compact = compact_from_latent_major_coo(
++                lat[order],
++                np.concatenate(doc_parts)[order],
++                np.concatenate(tok_parts)[order],
++                np.concatenate(val_parts)[order],
++            )
+         self.finalize_block_latents()
+ 
+     def iter_block_latents(self, block: int) -> List[int]:
+@@ -244,8 +253,7 @@ def exact_maxsim_via_index(
+ ) -> Tuple[np.ndarray, np.ndarray]:
+     """Exact MaxSim over a corpus chunk via inverted index (CPU, no approximation).
+ 
+-    Mathematically identical to dense ColBERT MaxSim when embeddings are the
+-    same sparse SAE token vectors (nonzeros only at top-k latent dimensions):
++    Paper Eq. 4, i.e. dense ColBERT MaxSim on the sparse SAE token vectors:
+ 
+         score(q, d) = sum_t max_s dot(q_t, d_s)
+ 
+@@ -257,44 +265,37 @@ def exact_maxsim_via_index(
+         If > 0, return only the top-N documents by score (for heap merging).
+         If <= 0, return scores for every document in the chunk index.
+     index_two_phase
+-        Coarse postings + coarse query top-k, then exact MaxSim on a candidate pool.
++        SSR++ (paper Sec. 3.3): Eq. 12 coarse scores with each query token's top
++        ``coarse_topk`` latents, keep ``two_phase_pool_size`` candidates, then exact
++        Eq. 4 refinement with the full query on those candidates.
++    index_candidate_pool
++        Same two-step scheme with the full query in the coarse step (lossy pool).
++
++    The GPU accumulate / doc-latent pruning knobs are accepted for API compatibility;
++    scoring always runs the exact CPU kernel in :mod:`.exact_index_maxsim` (the old
++    accumulators maximised single latent products instead of whole dot products).
+     """
+-    if index_two_phase:
+-        from .index_pruning import two_phase_maxsim_via_index
++    from .exact_index_maxsim import exact_maxsim_topk, ssr_plus_plus_topk
+ 
+-        return two_phase_maxsim_via_index(
++    del use_doc_latent_pruning, scan_postings, use_vectorized, index_parallel_workers
++    del index_accum_device, cuda_device, gpu_hot_budget_gb
++    if index_two_phase or index_candidate_pool > 0:
++        return ssr_plus_plus_topk(
+             query,
+             index,
+             top_docs=top_docs,
++            coarse_k=int(coarse_topk) if index_two_phase else 0,
++            n_candidates=int(two_phase_pool_size if index_two_phase else index_candidate_pool),
+             min_score=min_score,
+             query_token_weights=query_token_weights,
+-            pool_size=two_phase_pool_size,
+-            coarse_topk=coarse_topk,
+-            query_latent_top_k=query_latent_top_k,
+-            use_vectorized=use_vectorized,
+-            index_parallel_workers=index_parallel_workers,
+-            index_accum_device=index_accum_device,
+-            cuda_device=cuda_device,
+-            gpu_hot_budget_gb=gpu_hot_budget_gb,
+         )
+-    return _maxsim_via_index_impl(
++    return exact_maxsim_topk(
+         query,
+         index,
+         top_docs=top_docs,
+         min_score=min_score,
+         query_token_weights=query_token_weights,
+-        use_doc_latent_pruning=use_doc_latent_pruning,
+-        index_candidate_pool=index_candidate_pool,
+         query_latent_top_k=query_latent_top_k,
+-        index_two_phase=False,
+-        two_phase_pool_size=16_384,
+-        coarse_topk=8,
+-        scan_postings=scan_postings,
+-        use_vectorized=use_vectorized,
+-        index_parallel_workers=index_parallel_workers,
+-        index_accum_device=index_accum_device,
+-        cuda_device=cuda_device,
+-        gpu_hot_budget_gb=gpu_hot_budget_gb,
+     )
+ 
+ 
+@@ -350,14 +351,17 @@ def coarse_maxsim_via_index(
+     min_score: float = 0.0,
+     query_token_weights: np.ndarray | None = None,
+ ) -> Tuple[np.ndarray, np.ndarray]:
+-    """Alias: pruned pipeline uses the same index math (often with top_docs < |chunk|)."""
+-    return _maxsim_via_index_impl(
+-        query,
+-        index,
+-        top_docs=top_docs,
+-        min_score=min_score,
+-        query_token_weights=query_token_weights,
++    """SSR++ step 1 (paper Eq. 12): ``sum_t sum_u q_t^u * mu_{D,u}``, top ``top_docs``.
++
++    The pruned pipeline passes queries already cut to their top-``Kcoarse`` latents
++    per token (``prune_sparse_rows``), so all of the query's latents are used here.
++    """
++    from .exact_index_maxsim import _top, coarse_doc_scores
++
++    total = coarse_doc_scores(
++        query, index, coarse_k=0, query_token_weights=query_token_weights
+     )
++    return _top(total, top_docs, min_score)
+ 
+ 
+ def query_candidate_doc_ids(
+@@ -661,23 +665,22 @@ def _maxsim_via_index_impl_unblocked(
+     min_score: float = 0.0,
+     query_token_weights: np.ndarray | None = None,
+ ) -> Tuple[np.ndarray, np.ndarray]:
+-    """Reference: iterate every query latent (no block skipping)."""
++    """Reference (pure Python): per query token, sum over latents per (doc, doc-token),
++    then max over the doc's tokens (paper Eq. 4)."""
+     per_query_token: List[Dict[int, float]] = [
+         {} for _ in range(query.n_tokens)
+     ]
+     for qt in range(query.n_tokens):
+-        acc = per_query_token[qt]
++        pairs = TokenPairAccumulator()
+         w_q = 1.0 if query_token_weights is None else float(query_token_weights[qt])
+         for j in range(query.k):
+             latent = int(query.indices[qt, j])
+             if latent < 0:
+                 break
+             v_q = float(query.values[qt, j]) * w_q
+-            for doc_id, _tok_id, val in index.compact.iter_latent_rows(latent):
+-                contrib = v_q * val
+-                prev = acc.get(doc_id)
+-                if prev is None or contrib > prev:
+-                    acc[doc_id] = contrib
++            for doc_id, tok_id, val in index.compact.iter_latent_rows(latent):
++                pairs.add(doc_id, tok_id, v_q * val)
++        per_query_token[qt] = pairs.doc_scores_max_over_tokens()
+     return _finalize_maxsim_from_qt_dicts(
+         per_query_token, top_docs=top_docs, min_score=min_score
+     )
+@@ -922,8 +925,8 @@ def maxsim_index_results_equal(
+     min_score: float = 0.0,
+     atol: float = 1e-5,
+ ) -> bool:
+-    """True if block-first and unblocked index scoring agree."""
+-    a = _maxsim_via_index_impl(
++    """True if the exact index scorer and the pure-Python reference agree."""
++    a = exact_maxsim_via_index(
+         query, index, top_docs=top_docs, min_score=min_score
+     )
+     b = _maxsim_via_index_impl_unblocked(
+diff --git a/ssr/retrieval/metrics.py b/ssr/retrieval/metrics.py
+index 24fb34d..26a63ba 100644
+--- a/ssr/retrieval/metrics.py
++++ b/ssr/retrieval/metrics.py
+@@ -37,7 +37,7 @@ def compute_retrieval_metrics(
+     *,
+     query_ids: Sequence[str],
+     ranked_results: Sequence[Sequence[tuple[str, float]]],
+-    relevant_docs: Mapping[str, set[str]],
++    relevant_docs: Mapping[str, Mapping[str, int] | set[str]],
+     metrics: RetrievalMetrics | None = None,
+ ) -> Dict[str, float]:
+     """Compute IR metrics from ranked (corpus_id, score) lists per query."""
+@@ -52,7 +52,7 @@ def compute_retrieval_metrics(
+     avep = {k: [] for k in metrics.map_at_k}
+ 
+     for qid, hits in zip(query_ids, ranked_results):
+-        rel_set = relevant_docs.get(qid, set())
++        rel_set = relevant_docs.get(qid, {})
+         top_hits = sorted(hits, key=lambda x: x[1], reverse=True)
+ 
+         for k_val in metrics.accuracy_at_k:
+@@ -77,11 +77,11 @@ def compute_retrieval_metrics(
+                     mrr[k_val] += 1.0 / (rank + 1)
+                     break
+ 
++        # Graded gains (pytrec_eval / BEIR / MTEB); plain sets fall back to binary.
++        grades = rel_set if isinstance(rel_set, Mapping) else {d: 1 for d in rel_set}
+         for k_val in metrics.ndcg_at_k:
+-            predicted = [
+-                1 if doc_id in rel_set else 0 for doc_id, _ in top_hits[:k_val]
+-            ]
+-            ideal = [1] * min(len(rel_set), k_val)
++            predicted = [grades.get(doc_id, 0) for doc_id, _ in top_hits[:k_val]]
++            ideal = sorted(grades.values(), reverse=True)[:k_val]
+             idcg = _dcg_at_k(ideal, k_val)
+             ndcg[k_val].append(
+                 _dcg_at_k(predicted, k_val) / idcg if idcg > 0 else 0.0
+diff --git a/ssr/retrieval/mteb_io.py b/ssr/retrieval/mteb_io.py
+index c83bceb..e62c9ec 100644
+--- a/ssr/retrieval/mteb_io.py
++++ b/ssr/retrieval/mteb_io.py
+@@ -16,7 +16,8 @@ class MTEBRetrievalSplit:
+     corpus_texts: List[str]
+     query_ids: List[str]
+     query_texts: List[str]
+-    relevant_docs: Dict[str, set[str]]
++    # qid -> {doc_id: relevance grade > 0}; membership/len behave like a set.
++    relevant_docs: Dict[str, Dict[str, int]]
+ 
+ 
+ def count_corpus_jsonl(path: Path) -> int:
+@@ -84,8 +85,9 @@ def load_queries_tsv(path: Path) -> Tuple[List[str], List[str]]:
+     return ids, texts
+ 
+ 
+-def load_qrels_tsv(path: Path) -> Dict[str, set[str]]:
+-    qrels: Dict[str, set[str]] = {}
++def load_qrels_tsv(path: Path) -> Dict[str, Dict[str, int]]:
++    """Keep relevance grades: graded nDCG (BEIR/MTEB, paper App. D.1) needs them."""
++    qrels: Dict[str, Dict[str, int]] = {}
+     with open(path, encoding="utf-8") as f:
+         for line in f:
+             line = line.strip()
+@@ -93,7 +95,7 @@ def load_qrels_tsv(path: Path) -> Dict[str, set[str]]:
+                 continue
+             qid, _, doc_id, rel = line.split("\t")
+             if int(rel) > 0:
+-                qrels.setdefault(qid, set()).add(doc_id)
++                qrels.setdefault(qid, {})[doc_id] = int(rel)
+     return qrels
+ 
+ 
+diff --git a/ssr/retrieval/retriever.py b/ssr/retrieval/retriever.py
+index a4de6dc..412a181 100644
+--- a/ssr/retrieval/retriever.py
++++ b/ssr/retrieval/retriever.py
+@@ -13,7 +13,6 @@ import torch
+ from tqdm import tqdm
+ 
+ from .inverted_index import build_chunk_index, coarse_maxsim_via_index
+-from .maxsim import maxsim_query_vs_documents
+ from .sparse_repr import SparseTokenEmbeddings, batch_dense_to_sparse, dense_tokens_to_sparse
+ 
+ logger = logging.getLogger(__name__)
+@@ -188,19 +187,27 @@ class SparseMaxSimRetriever:
+         device: str = "cpu",
+         show_progress: bool = True,
+     ) -> List[List[Tuple[str, float]]]:
+-        """Return top_k (corpus_id, score) per query."""
++        """SSR++ (paper Sec. 3.3): return top_k (corpus_id, score) per query.
++
++        Step 1: Eq. 12 coarse scores with ``query_sparse`` (already cut to the top
++        ``Kcoarse`` latents per token); keep the global top ``n_candidates`` docs.
++        Step 2: exact Eq. 4 with ``query_sparse_fine`` (full K) on those candidates.
++        """
++        from .exact_index_maxsim import exact_doc_scores
++
++        del device  # exact refinement runs in the CPU index kernel
+         cfg = self.config
+         n_queries = len(query_sparse)
+         fine_queries = query_sparse_fine or query_sparse
+ 
+-        max_heap_size = max(top_k, cfg.n_candidates)
+-        heaps: List[List[Tuple[float, str]]] = [[] for _ in range(n_queries)]
++        heaps: List[List[Tuple[float, int]]] = [[] for _ in range(n_queries)]
++        chunks: List[Tuple[int, object]] = []
+ 
+         chunk_starts = range(0, len(corpus_sparse), cfg.corpus_chunk_size)
+         if show_progress:
+             chunk_starts = tqdm(
+                 chunk_starts,
+-                desc="Retrieve (chunked inverted index)",
++                desc="SSR++ step 1 (coarse, chunked inverted index)",
+             )
+ 
+         for chunk_start in chunk_starts:
+@@ -212,51 +219,44 @@ class SparseMaxSimRetriever:
+                 n_latents=n_latents,
+                 block_size=cfg.block_size,
+             )
++            chunks.append((chunk_start, index))
+ 
+-            for q_start in range(0, n_queries, cfg.query_batch_size):
+-                q_end = min(q_start + cfg.query_batch_size, n_queries)
+-                for local_qi, qi in enumerate(range(q_start, q_end)):
+-                    doc_local, scores = coarse_maxsim_via_index(
+-                        query_sparse[qi],
+-                        index,
+-                        top_docs=cfg.n_candidates,
+-                    )
+-                    for doc_loc, score in zip(doc_local, scores):
+-                        global_doc_idx = int(chunk_start + doc_loc)
+-                        cid = corpus_ids[global_doc_idx]
+-                        heap = heaps[qi]
+-                        entry = (float(score), cid)
+-                        if len(heap) < max_heap_size:
+-                            heapq.heappush(heap, entry)
+-                        elif score > heap[0][0]:
+-                            heapq.heapreplace(heap, entry)
++            for qi in range(n_queries):
++                doc_local, scores = coarse_maxsim_via_index(
++                    query_sparse[qi],
++                    index,
++                    top_docs=cfg.n_candidates,
++                )
++                heap = heaps[qi]
++                for doc_loc, score in zip(doc_local, scores):
++                    entry = (float(score), int(chunk_start + doc_loc))
++                    if len(heap) < cfg.n_candidates:
++                        heapq.heappush(heap, entry)
++                    elif entry[0] > heap[0][0]:
++                        heapq.heapreplace(heap, entry)
+ 
+-        results: List[List[Tuple[str, float]]] = []
+-        for qi in range(n_queries):
+-            heap = heaps[qi]
+-            candidates = sorted(heap, key=lambda x: x[0], reverse=True)
+-            if not cfg.use_fine_rerank or not candidates:
+-                results.append([(cid, sc) for sc, cid in candidates[:top_k]])
+-                continue
++        if not cfg.use_fine_rerank:
++            return [
++                [(corpus_ids[g], sc) for sc, g in sorted(h, reverse=True)[:top_k]]
++                for h in heaps
++            ]
+ 
+-            cand_ids = [cid for _, cid in candidates[: cfg.n_candidates]]
+-            id_to_idx = {corpus_ids[i]: i for i in range(len(corpus_ids))}
+-            cand_indices = [id_to_idx[c] for c in cand_ids if c in id_to_idx]
+-            cand_docs = [corpus_sparse[i] for i in cand_indices]
+-            fine_scores = maxsim_query_vs_documents(
+-                fine_queries[qi],
+-                cand_docs,
+-                device=device,
+-                batch_size=cfg.fine_batch_size,
+-            )
+-            reranked = sorted(
+-                zip([cand_ids[i] for i in range(len(cand_indices))], fine_scores),
+-                key=lambda x: x[1],
+-                reverse=True,
+-            )
+-            results.append(reranked[:top_k])
++        fine: List[List[Tuple[float, int]]] = [[] for _ in range(n_queries)]
++        for chunk_start, index in chunks:
++            n_docs = int(index.n_docs)
++            for qi in range(n_queries):
++                local = [g - chunk_start for _, g in heaps[qi] if chunk_start <= g < chunk_start + n_docs]
++                if not local:
++                    continue
++                allowed = np.zeros(n_docs, dtype=np.bool_)
++                allowed[local] = True
++                total = exact_doc_scores(fine_queries[qi], index, allowed=allowed)
++                fine[qi].extend((float(total[d]), int(chunk_start + d)) for d in local)
+ 
+-        return results
++        return [
++            [(corpus_ids[g], sc) for sc, g in sorted(f, key=lambda x: x[0], reverse=True)[:top_k]]
++            for f in fine
++        ]
+ 
+ 
+ def build_retriever(config: RetrieverConfig):
+diff --git a/ssr/sparse_autoencoder.py b/ssr/sparse_autoencoder.py
+index 8d2dcd1..1859296 100644
+--- a/ssr/sparse_autoencoder.py
++++ b/ssr/sparse_autoencoder.py
+@@ -306,6 +306,9 @@ class SparseAutoencoder(Module):
+             "local_files_only": local_files_only,
+         }
+         config = cls.load_config(model_name_or_path=model_name_or_path, **hub_kwargs)
++        # Released checkpoints carry extra keys (e.g. center_inputs, l2_normalize_inputs)
++        # from the authors' internal code; ignore what this module does not define.
++        config = {k: v for k, v in config.items() if k in cls.config_keys}
+         model = cls(**config)
+         return cls.load_torch_weights(
+             model_name_or_path=model_name_or_path,
+diff --git a/ssr/train.py b/ssr/train.py
+index fe2d5f9..410ea69 100644
+--- a/ssr/train.py
++++ b/ssr/train.py
+@@ -115,6 +115,12 @@ def parse_args() -> argparse.Namespace:
+         default=1.0,
+         help="Top-K SAE reconstruction loss weight; 0 disables this term.",
+     )
++    parser.add_argument(
++        "--recon-4k-coef",
++        type=float,
++        default=0.125,
++        help="Weight of L_recon(4k) (paper Eq. 7 uses 1/8); 0 disables this term.",
++    )
+     parser.add_argument(
+         "--auxk-coef",
+         type=float,
+@@ -181,6 +187,15 @@ def parse_args() -> argparse.Namespace:
+         default=0,
+         help="Which hard negative index to use (0=hardest).",
+     )
++    parser.add_argument(
++        "--negatives-per-query",
++        type=int,
++        default=1,
++        help=(
++            "Triplets per query, one per BM25 hard negative (authors' setup: 32, GitHub "
++            "issue #1). Values > 1 also group each query's triplets into one batch."
++        ),
++    )
+     parser.add_argument(
+         "--max-train-samples",
+         type=int,
+@@ -241,6 +256,12 @@ def parse_args() -> argparse.Namespace:
+         ),
+     )
+     parser.add_argument("--learning-rate", type=float, default=2e-5)
++    parser.add_argument(
++        "--warmup-steps",
++        type=int,
++        default=0,
++        help="Linear LR warmup steps (paper Table 6: 20000).",
++    )
+     parser.add_argument("--fp16", action="store_true", default=True)
+     parser.add_argument("--bf16", action="store_true", default=False)
+     parser.add_argument("--compile", action="store_true", help="torch.compile the model.")
+@@ -308,6 +329,7 @@ def load_datasets(args: argparse.Namespace, sample_format: str):
+             negative_rank=args.negative_rank,
+             max_train_samples=args.max_train_samples,
+             max_eval_samples=args.max_eval_samples,
++            negatives_per_query=args.negatives_per_query,
+         )
+ 
+     if sample_format != "triplet":
+@@ -335,6 +357,8 @@ def main(args: argparse.Namespace) -> None:
+     import torch
+     from sentence_transformers import SentenceTransformerTrainer, SentenceTransformerTrainingArguments
+ 
++    from ssr.samplers import QueryGroupedBatchSampler
++
+     from pylate import evaluation, utils
+ 
+     logging.basicConfig(
+@@ -377,6 +401,7 @@ def main(args: argparse.Namespace) -> None:
+         auxk=args.auxk_coef,
+         ucl=args.ucl_coef,
+         maxsim=args.maxsim_coef,
++        recon_4k=args.recon_4k_coef,
+     )
+     validate_loss_weights(
+         sample_format,
+@@ -386,9 +411,10 @@ def main(args: argparse.Namespace) -> None:
+         maxsim_coef=loss_weights.maxsim,
+     )
+     logger.info(
+-        "sample_format=%s | loss weights: recon=%s auxk=%s ucl=%s maxsim=%s",
++        "sample_format=%s | loss weights: recon=%s recon_4k=%s auxk=%s ucl=%s maxsim=%s",
+         sample_format,
+         loss_weights.recon,
++        loss_weights.recon_4k,
+         loss_weights.auxk,
+         loss_weights.ucl,
+         loss_weights.maxsim,
+@@ -454,6 +480,12 @@ def main(args: argparse.Namespace) -> None:
+         bf16=args.bf16,
+         run_name=args.run_name,
+         learning_rate=args.learning_rate,
++        warmup_steps=args.warmup_steps,
++        **(
++            {"batch_sampler": QueryGroupedBatchSampler}
++            if args.negatives_per_query > 1 and sample_format == "triplet"
++            else {}
++        ),
+         seed=args.seed,
+         logging_steps=args.logging_steps,
+         eval_strategy="steps",
+diff --git a/ssr/retrieval/exact_index_maxsim.py b/ssr/retrieval/exact_index_maxsim.py
+new file mode 100644
+index 0000000..fd9a177
+--- /dev/null
++++ b/ssr/retrieval/exact_index_maxsim.py
+@@ -0,0 +1,354 @@
++"""Paper-faithful sparse late-interaction scoring on the token-level inverted index.
++
++Exact SSR score (paper Eq. 4)::
++
++    S(Q, D) = sum_i max_j sum_{u in A(q_i) ∩ A(d_j)} q_i^u * d_j^u
++
++Every posting keeps ``(doc_idx, token_idx, value)``, so for each query token the
++dot products are accumulated per (doc, doc-token) row and only *then* maximised over
++the document's tokens. (The previous index accumulators maximised each single
++``q_i^u * d_j^u`` product over latents, i.e. ``sum_i max_u q_i^u * max_j d_j^u``, which
++is not MaxSim.)
++
++SSR++ (paper Sec. 3.3):
++
++* Step 1, coarse (Eq. 11-12): ``S_coarse = sum_i sum_{u in A_Kcoarse(q_i)} q_i^u * mu_{D,u}``
++  with ``mu_{D,u} = max_j d_j^u``; keep the top ``n_candidates`` documents.
++* Step 2, exact refinement: Eq. 4 with the full query on the candidates only.
++
++All values are non-negative (TopK + ReLU, then L2-normalised), so doc tokens that share
++no latent with a query token contribute 0 and can be skipped without changing the max.
++"""
++
++from __future__ import annotations
++
++from typing import Tuple
++
++import numpy as np
++
++from .sparse_repr import SparseTokenEmbeddings
++
++try:
++    from numba import njit
++
++    _NUMBA_OK = True
++except ImportError:  # pragma: no cover - numba is in the [eval] extra
++    _NUMBA_OK = False
++
++    def njit(*args, **kwargs):  # type: ignore[no-redef]
++        def wrap(fn):
++            return fn
++
++        return wrap if not (args and callable(args[0])) else args[0]
++
++
++@njit(cache=True)
++def _exact_totals_kernel(
++    offsets: np.ndarray,
++    doc_idx: np.ndarray,
++    token_idx: np.ndarray,
++    values: np.ndarray,
++    row_start: np.ndarray,
++    row_doc: np.ndarray,
++    qt_offsets: np.ndarray,
++    seg_rows: np.ndarray,
++    seg_vq: np.ndarray,
++    allowed: np.ndarray,
++    use_allowed: bool,
++    acc: np.ndarray,
++    row_gen: np.ndarray,
++    touched_rows: np.ndarray,
++    doc_best: np.ndarray,
++    doc_gen: np.ndarray,
++    touched_docs: np.ndarray,
++    gen_state: np.ndarray,
++    doc_total: np.ndarray,
++) -> None:
++    n_qt = qt_offsets.shape[0] - 1
++    for qt in range(n_qt):
++        gen_state[0] += 1
++        gen = gen_state[0]
++        n_rows = 0
++        for k in range(qt_offsets[qt], qt_offsets[qt + 1]):
++            li = seg_rows[k]
++            vq = seg_vq[k]
++            for p in range(offsets[li], offsets[li + 1]):
++                d = doc_idx[p]
++                if use_allowed and not allowed[d]:
++                    continue
++                r = row_start[d] + token_idx[p]
++                if row_gen[r] != gen:
++                    row_gen[r] = gen
++                    acc[r] = 0.0
++                    touched_rows[n_rows] = r
++                    n_rows += 1
++                acc[r] += vq * values[p]
++        n_docs = 0
++        for i in range(n_rows):
++            r = touched_rows[i]
++            d = row_doc[r]
++            if doc_gen[d] != gen:
++                doc_gen[d] = gen
++                doc_best[d] = acc[r]
++                touched_docs[n_docs] = d
++                n_docs += 1
++            elif acc[r] > doc_best[d]:
++                doc_best[d] = acc[r]
++        for i in range(n_docs):
++            d = touched_docs[i]
++            doc_total[d] += doc_best[d]
++
++
++@njit(cache=True)
++def _coarse_totals_kernel(
++    mu_offsets: np.ndarray,
++    mu_doc: np.ndarray,
++    mu_val: np.ndarray,
++    seg_rows: np.ndarray,
++    seg_vq: np.ndarray,
++    doc_total: np.ndarray,
++) -> None:
++    for k in range(seg_rows.shape[0]):
++        li = seg_rows[k]
++        vq = seg_vq[k]
++        for p in range(mu_offsets[li], mu_offsets[li + 1]):
++            doc_total[mu_doc[p]] += vq * mu_val[p]
++
++
++class _ExactState:
++    """Per-index layout and scratch buffers (built once, reused across queries)."""
++
++    def __init__(self, index) -> None:
++        compact = index.compact
++        n_docs = int(index.n_docs)
++        doc = compact.doc_idx.astype(np.int64, copy=False)
++        tok = compact.token_idx.astype(np.int64, copy=False)
++        n_tok = np.zeros(n_docs, dtype=np.int64)
++        if doc.size:
++            np.maximum.at(n_tok, doc, tok + 1)
++        self.row_start = np.zeros(n_docs + 1, dtype=np.int64)
++        np.cumsum(n_tok, out=self.row_start[1:])
++        n_rows = int(self.row_start[-1])
++        self.row_doc = np.repeat(np.arange(n_docs, dtype=np.int32), n_tok)
++        self.doc_idx = compact.doc_idx.astype(np.int32, copy=False)
++        self.token_idx = compact.token_idx.astype(np.int32, copy=False)
++        self.values = compact.values.astype(np.float32, copy=False)
++        self.offsets = compact.offsets.astype(np.int64, copy=False)
++        self.latent_ids = compact.latent_ids
++        self.latent_row_index = index.latent_row_index
++        self.n_docs = n_docs
++        self.n_latents = int(index.n_latents)
++        self.acc = np.zeros(max(n_rows, 1), dtype=np.float32)
++        self.row_gen = np.zeros(max(n_rows, 1), dtype=np.int64)
++        self.touched_rows = np.zeros(max(n_rows, 1), dtype=np.int64)
++        self.doc_best = np.zeros(max(n_docs, 1), dtype=np.float32)
++        self.doc_gen = np.zeros(max(n_docs, 1), dtype=np.int64)
++        self.touched_docs = np.zeros(max(n_docs, 1), dtype=np.int32)
++        self.gen_state = np.zeros(1, dtype=np.int64)
++        self._mu: tuple[np.ndarray, np.ndarray, np.ndarray] | None = None
++
++    def latent_row(self, latent: int) -> int:
++        if self.latent_row_index is not None:
++            if 0 <= latent < self.latent_row_index.shape[0]:
++                return int(self.latent_row_index[latent])
++            return -1
++        i = int(np.searchsorted(self.latent_ids, latent))
++        if i < self.latent_ids.shape[0] and int(self.latent_ids[i]) == latent:
++            return i
++        return -1
++
++    def mu_postings(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
++        """``mu_{D,u} = max_j d_j^u`` per (latent row, doc), paper Eq. 11."""
++        if self._mu is None:
++            n_rows_lat = self.offsets.shape[0] - 1
++            lat_of_posting = np.repeat(
++                np.arange(n_rows_lat, dtype=np.int64), np.diff(self.offsets)
++            )
++            key = lat_of_posting * np.int64(self.n_docs + 1) + self.doc_idx.astype(np.int64)
++            order = np.lexsort((-self.values, key))
++            key_sorted = key[order]
++            first = np.ones(key_sorted.shape[0], dtype=bool)
++            first[1:] = key_sorted[1:] != key_sorted[:-1]
++            sel = order[first]
++            lat_sel = lat_of_posting[sel]
++            mu_offsets = np.zeros(n_rows_lat + 1, dtype=np.int64)
++            np.add.at(mu_offsets, lat_sel + 1, 1)
++            np.cumsum(mu_offsets, out=mu_offsets)
++            self._mu = (
++                mu_offsets,
++                self.doc_idx[sel].astype(np.int32),
++                self.values[sel].astype(np.float32),
++            )
++        return self._mu
++
++
++def _state(index) -> _ExactState:
++    st = getattr(index, "_ssr_exact_state", None)
++    if st is None or st.n_docs != int(index.n_docs):
++        st = _ExactState(index)
++        index._ssr_exact_state = st  # type: ignore[attr-defined]
++    return st
++
++
++def _query_segments(
++    query: SparseTokenEmbeddings,
++    st: _ExactState,
++    *,
++    per_token_k: int = 0,
++    query_token_weights: np.ndarray | None = None,
++) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
++    """(qt_offsets, latent rows, query values), optionally top ``per_token_k`` per token."""
++    rows: list[int] = []
++    vqs: list[float] = []
++    qt_offsets = [0]
++    for t in range(query.n_tokens):
++        idx = query.indices[t]
++        val = query.values[t]
++        valid = idx >= 0
++        idx, val = idx[valid], val[valid]
++        if per_token_k > 0 and idx.size > per_token_k:
++            keep = np.argpartition(-val, per_token_k - 1)[:per_token_k]
++            idx, val = idx[keep], val[keep]
++        w = 1.0 if query_token_weights is None else float(query_token_weights[t])
++        for u, v in zip(idx.tolist(), val.tolist()):
++            if v <= 0.0:
++                continue
++            li = st.latent_row(int(u))
++            if li >= 0:
++                rows.append(li)
++                vqs.append(float(v) * w)
++        qt_offsets.append(len(rows))
++    return (
++        np.asarray(qt_offsets, dtype=np.int64),
++        np.asarray(rows, dtype=np.int64),
++        np.asarray(vqs, dtype=np.float32),
++    )
++
++
++def exact_doc_scores(
++    query: SparseTokenEmbeddings,
++    index,
++    *,
++    allowed: np.ndarray | None = None,
++    query_token_weights: np.ndarray | None = None,
++    query_latent_top_k: int = 0,
++) -> np.ndarray:
++    """Exact Eq. 4 score for every doc in ``index`` (0 for docs without overlap)."""
++    st = _state(index)
++    doc_total = np.zeros(max(st.n_docs, 1), dtype=np.float32)[: st.n_docs]
++    if st.n_docs == 0 or query.n_tokens == 0:
++        return doc_total
++    qt_offsets, rows, vqs = _query_segments(
++        query, st, per_token_k=query_latent_top_k, query_token_weights=query_token_weights
++    )
++    if rows.size == 0:
++        return doc_total
++    use_allowed = allowed is not None
++    allowed_arr = (
++        np.asarray(allowed, dtype=np.bool_) if use_allowed else np.zeros(1, dtype=np.bool_)
++    )
++    _exact_totals_kernel(
++        st.offsets, st.doc_idx, st.token_idx, st.values, st.row_start, st.row_doc,
++        qt_offsets, rows, vqs, allowed_arr, use_allowed,
++        st.acc, st.row_gen, st.touched_rows, st.doc_best, st.doc_gen, st.touched_docs,
++        st.gen_state, doc_total,
++    )
++    return doc_total
++
++
++def coarse_doc_scores(
++    query: SparseTokenEmbeddings,
++    index,
++    *,
++    coarse_k: int,
++    query_token_weights: np.ndarray | None = None,
++) -> np.ndarray:
++    """SSR++ step 1 (Eq. 12): sum over each query token's top-``coarse_k`` latents of q * mu."""
++    st = _state(index)
++    doc_total = np.zeros(st.n_docs, dtype=np.float32)
++    if st.n_docs == 0 or query.n_tokens == 0:
++        return doc_total
++    _qt, rows, vqs = _query_segments(
++        query, st, per_token_k=coarse_k, query_token_weights=query_token_weights
++    )
++    if rows.size:
++        mu_offsets, mu_doc, mu_val = st.mu_postings()
++        _coarse_totals_kernel(mu_offsets, mu_doc, mu_val, rows, vqs, doc_total)
++    return doc_total
++
++
++def _top(total: np.ndarray, top_docs: int, min_score: float) -> Tuple[np.ndarray, np.ndarray]:
++    keep = np.nonzero(total > max(float(min_score), 0.0))[0]
++    if keep.size == 0:
++        return np.array([], dtype=np.int64), np.array([], dtype=np.float32)
++    if top_docs > 0 and keep.size > top_docs:
++        part = np.argpartition(-total[keep], top_docs - 1)[:top_docs]
++        keep = keep[part]
++    order = np.argsort(-total[keep], kind="stable")
++    keep = keep[order]
++    return keep.astype(np.int64), total[keep].astype(np.float32)
++
++
++def exact_maxsim_topk(
++    query: SparseTokenEmbeddings,
++    index,
++    *,
++    top_docs: int,
++    min_score: float = 0.0,
++    query_token_weights: np.ndarray | None = None,
++    query_latent_top_k: int = 0,
++) -> Tuple[np.ndarray, np.ndarray]:
++    """SSR: exact Eq. 4 over all documents; returns (doc_local_ids, scores) sorted desc."""
++    total = exact_doc_scores(
++        query,
++        index,
++        query_token_weights=query_token_weights,
++        query_latent_top_k=query_latent_top_k,
++    )
++    return _top(total, top_docs, min_score)
++
++
++def ssr_plus_plus_topk(
++    query: SparseTokenEmbeddings,
++    index,
++    *,
++    top_docs: int,
++    coarse_k: int = 4,
++    n_candidates: int = 2000,
++    min_score: float = 0.0,
++    query_token_weights: np.ndarray | None = None,
++) -> Tuple[np.ndarray, np.ndarray]:
++    """SSR++: Eq. 12 coarse top-``n_candidates`` then exact Eq. 4 refinement on them."""
++    coarse = coarse_doc_scores(
++        query, index, coarse_k=coarse_k, query_token_weights=query_token_weights
++    )
++    cand, _ = _top(coarse, n_candidates, 0.0)
++    if cand.size == 0:
++        return cand, np.array([], dtype=np.float32)
++    allowed = np.zeros(coarse.shape[0], dtype=np.bool_)
++    allowed[cand] = True
++    total = exact_doc_scores(
++        query, index, allowed=allowed, query_token_weights=query_token_weights
++    )
++    return _top(total, top_docs, min_score)
++
++
++def reference_maxsim_dense(
++    query: SparseTokenEmbeddings, doc: SparseTokenEmbeddings
++) -> float:
++    """Dense reference implementation of Eq. 4 (for tests)."""
++    n_lat = max(int(query.n_latents), int(doc.n_latents))
++
++    def dense(s: SparseTokenEmbeddings) -> np.ndarray:
++        m = np.zeros((s.n_tokens, n_lat), dtype=np.float64)
++        for t in range(s.n_tokens):
++            for j in range(s.k):
++                u = int(s.indices[t, j])
++                if u >= 0:
++                    m[t, u] = float(s.values[t, j])
++        return m
++
++    q, d = dense(query), dense(doc)
++    if q.size == 0 or d.size == 0:
++        return 0.0
++    return float((q @ d.T).max(axis=1).clip(min=0.0).sum())
+diff --git a/ssr/samplers.py b/ssr/samplers.py
+new file mode 100644
+index 0000000..2469342
+--- /dev/null
++++ b/ssr/samplers.py
+@@ -0,0 +1,69 @@
++"""Batch sampler that keeps all triplets of one query in the same batch.
++
++The authors' training setup (GitHub issue #1, not described in the paper): 32 BM25 hard
++negatives per query give 32 triplets per query, and the triplets of a query are grouped
++into one batch (e.g. 2 queries x 32 triplets for batch size 64). Groups are the runs of
++consecutive rows with the same ``query`` text, as produced by the triplet loader; their
++order is shuffled every epoch, and groups are packed into batches without being split
++unless a single group is larger than the batch.
++"""
++
++from __future__ import annotations
++
++from collections.abc import Iterator
++
++import torch
++from sentence_transformers.sampler import DefaultBatchSampler
++
++
++class QueryGroupedBatchSampler(DefaultBatchSampler):
++    def __init__(
++        self,
++        dataset,
++        batch_size: int,
++        drop_last: bool,
++        valid_label_columns: list[str] | None = None,
++        generator: torch.Generator | None = None,
++        seed: int = 0,
++    ) -> None:
++        super().__init__(
++            dataset,
++            batch_size=batch_size,
++            drop_last=drop_last,
++            valid_label_columns=valid_label_columns,
++            generator=generator,
++            seed=seed,
++        )
++        queries = dataset["query"]
++        groups: list[list[int]] = []
++        for i, q in enumerate(queries):
++            if i > 0 and q == queries[i - 1]:
++                groups[-1].append(i)
++            else:
++                groups.append([i])
++        self.groups = groups
++
++    def _batches(self) -> list[list[int]]:
++        g = torch.Generator()
++        g.manual_seed(int(self.seed) + int(self.epoch))
++        order = torch.randperm(len(self.groups), generator=g).tolist()
++        batches: list[list[int]] = []
++        current: list[int] = []
++        for gi in order:
++            group = self.groups[gi]
++            if current and len(current) + len(group) > self.batch_size:
++                batches.append(current)
++                current = []
++            while len(group) > self.batch_size:  # oversized group: split it
++                batches.append(group[: self.batch_size])
++                group = group[self.batch_size :]
++            current = current + group
++        if current and (not self.drop_last or len(current) == self.batch_size):
++            batches.append(current)
++        return batches
++
++    def __iter__(self) -> Iterator[list[int]]:
++        yield from self._batches()
++
++    def __len__(self) -> int:
++        return len(self._batches())
+diff --git a/tests/test_exact_index_maxsim.py b/tests/test_exact_index_maxsim.py
+new file mode 100644
+index 0000000..a26fe00
+--- /dev/null
++++ b/tests/test_exact_index_maxsim.py
+@@ -0,0 +1,108 @@
++"""Exactness tests for the inverted-index SSR scorer (paper Eq. 4 / Eq. 12).
++
++Run: python -m pytest tests/test_exact_index_maxsim.py   (or: python tests/test_exact_index_maxsim.py)
++"""
++
++from __future__ import annotations
++
++import sys
++from pathlib import Path
++
++import numpy as np
++
++sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
++
++from ssr.retrieval.exact_index_maxsim import (  # noqa: E402
++    coarse_doc_scores,
++    exact_doc_scores,
++    reference_maxsim_dense,
++    ssr_plus_plus_topk,
++)
++from ssr.retrieval.inverted_index import build_chunk_index, exact_maxsim_via_index  # noqa: E402
++from ssr.retrieval.sparse_repr import SparseTokenEmbeddings  # noqa: E402
++
++
++def _random_sparse(rng, n_tokens, n_latents, k, active_latents=None) -> SparseTokenEmbeddings:
++    idx = np.full((n_tokens, k), -1, dtype=np.int32)
++    val = np.zeros((n_tokens, k), dtype=np.float32)
++    pool = np.arange(n_latents) if active_latents is None else active_latents
++    for t in range(n_tokens):
++        kk = int(rng.integers(1, k + 1))
++        u = rng.choice(pool, size=kk, replace=False)
++        v = rng.random(kk).astype(np.float32) + 0.01
++        v /= np.linalg.norm(v)
++        idx[t, :kk] = u
++        val[t, :kk] = v
++    return SparseTokenEmbeddings(indices=idx, values=val, n_latents=n_latents)
++
++
++def _corpus(seed=0, n_docs=60, n_latents=64, k=6):
++    rng = np.random.default_rng(seed)
++    active = np.arange(n_latents // 2)  # small vocabulary => many overlaps
++    docs = [_random_sparse(rng, int(rng.integers(1, 12)), n_latents, k, active) for _ in range(n_docs)]
++    queries = [_random_sparse(rng, int(rng.integers(1, 8)), n_latents, k, active) for _ in range(15)]
++    return docs, queries
++
++
++def test_exact_matches_dense_reference():
++    docs, queries = _corpus()
++    index = build_chunk_index(docs, n_latents=docs[0].n_latents, block_size=16)
++    for q in queries:
++        got = exact_doc_scores(q, index)
++        want = np.array([reference_maxsim_dense(q, d) for d in docs])
++        np.testing.assert_allclose(got, want, rtol=1e-5, atol=1e-5)
++
++
++def test_repo_entry_point_is_exact():
++    docs, queries = _corpus(seed=1)
++    index = build_chunk_index(docs, n_latents=docs[0].n_latents, block_size=16)
++    for q in queries:
++        ids, scores = exact_maxsim_via_index(q, index, top_docs=10)
++        want = np.array([reference_maxsim_dense(q, d) for d in docs])
++        top_want = np.sort(want)[::-1][: len(ids)]
++        np.testing.assert_allclose(np.sort(scores)[::-1], top_want, rtol=1e-5, atol=1e-5)
++        np.testing.assert_allclose(scores, want[ids], rtol=1e-5, atol=1e-5)
++
++
++def test_coarse_is_eq12():
++    docs, queries = _corpus(seed=2)
++    index = build_chunk_index(docs, n_latents=docs[0].n_latents, block_size=16)
++    for q in queries:
++        got = coarse_doc_scores(q, index, coarse_k=2)
++        want = np.zeros(len(docs))
++        for t in range(q.n_tokens):
++            valid = q.indices[t] >= 0
++            u, v = q.indices[t][valid], q.values[t][valid]
++            top = np.argsort(-v)[:2]
++            for uu, vv in zip(u[top], v[top]):
++                for di, d in enumerate(docs):
++                    m = d.indices == uu
++                    if m.any():
++                        want[di] += vv * d.values[m].max()
++        np.testing.assert_allclose(got, want, rtol=1e-5, atol=1e-5)
++
++
++def test_ssrpp_with_full_pool_equals_exact():
++    docs, queries = _corpus(seed=3)
++    index = build_chunk_index(docs, n_latents=docs[0].n_latents, block_size=16)
++    for q in queries:
++        ids, scores = ssr_plus_plus_topk(q, index, top_docs=10, coarse_k=100, n_candidates=len(docs))
++        want = np.array([reference_maxsim_dense(q, d) for d in docs])
++        np.testing.assert_allclose(scores, want[ids], rtol=1e-5, atol=1e-5)
++        np.testing.assert_allclose(scores, np.sort(want)[::-1][: len(ids)], rtol=1e-5, atol=1e-5)
++
++
++def test_python_reference_agrees():
++    from ssr.retrieval.inverted_index import maxsim_index_results_equal
++
++    docs, queries = _corpus(seed=4)
++    index = build_chunk_index(docs, n_latents=docs[0].n_latents, block_size=16)
++    for q in queries:
++        assert maxsim_index_results_equal(q, index, top_docs=0)
++
++
++if __name__ == "__main__":
++    for name, fn in list(globals().items()):
++        if name.startswith("test_"):
++            fn()
++            print("ok", name)
+diff --git a/tests/test_samplers.py b/tests/test_samplers.py
+new file mode 100644
+index 0000000..cf4bd52
+--- /dev/null
++++ b/tests/test_samplers.py
+@@ -0,0 +1,55 @@
++"""QueryGroupedBatchSampler: whole query groups per batch, every row once per epoch.
++
++Run: python tests/test_samplers.py
++"""
++
++from __future__ import annotations
++
++import sys
++from pathlib import Path
++
++sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
++
++from datasets import Dataset  # noqa: E402
++
++from ssr.samplers import QueryGroupedBatchSampler  # noqa: E402
++
++
++def _dataset(sizes):
++    rows = []
++    for qi, n in enumerate(sizes):
++        rows += [{"query": f"q{qi}", "positive": "p", "negative": f"n{j}"} for j in range(n)]
++    return Dataset.from_list(rows)
++
++
++def test_groups_stay_together_and_cover_all_rows():
++    ds = _dataset([32] * 7 + [20, 5])
++    s = QueryGroupedBatchSampler(ds, batch_size=64, drop_last=False, seed=3)
++    for epoch in range(3):
++        s.set_epoch(epoch)
++        batches = list(iter(s))
++        assert sorted(i for b in batches for i in b) == list(range(len(ds)))
++        for b in batches:
++            assert len(b) <= 64
++            qs = [ds[i]["query"] for i in b]
++            for q in set(qs):
++                assert qs.count(q) == sum(1 for x in ds["query"] if x == q)
++
++
++def test_epochs_reshuffle_and_oversized_groups_split():
++    ds = _dataset([100, 10, 10])
++    s = QueryGroupedBatchSampler(ds, batch_size=64, drop_last=False, seed=0)
++    s.set_epoch(0)
++    a = list(iter(s))
++    s.set_epoch(1)
++    b = list(iter(s))
++    assert all(len(x) <= 64 for x in a + b)
++    assert sorted(i for x in a for i in x) == list(range(len(ds)))
++    assert [x[0] for x in a] != [x[0] for x in b] or len(a) == 1
++
++
++if __name__ == "__main__":
++    for name, fn in list(globals().items()):
++        if name.startswith("test_"):
++            fn()
++            print("ok", name)
+diff --git a/scripts/train_table6.sh b/scripts/train_table6.sh
+new file mode 100644
+index 0000000..8c9365c
+--- /dev/null
++++ b/scripts/train_table6.sh
+@@ -0,0 +1,34 @@
++#!/usr/bin/env bash
++# Token SAE (SSR) with the hyper-parameters of paper Table 6 / App. D.1 (BERT-base).
++#
++# Not specified by the paper, taken from the authors' replies in GitHub issue #1:
++#   - L_CE temperature 0.3;
++#   - BERT is fine-tuned (not frozen);
++#   - 32 BM25 hard negatives per query, triplets of one query grouped in one batch
++#     (--negatives-per-query 32, ssr/samplers.py);
++#   - lr 1e-3 (Table 6) was "not the most stable setting"; ~1e-6 worked better for
++#     token-level SAE training -> see scripts/train_issue1_setup.sh.
++# Extra arguments are forwarded, e.g. --gpu 0 --report-to none.
++set -euo pipefail
++
++python -m ssr.train \
++  --dataset msmarco-passage \
++  --data-dir data/processed/msmarco/passage \
++  --sample-format triplet \
++  --model-name bert-base-uncased \
++  --sae-token-scope non-cls \
++  --n-latents 16384 \
++  --topk 32 \
++  --auxk 2048 \
++  --recon-coef 1.0 \
++  --recon-4k-coef 0.125 \
++  --auxk-coef 0.03125 \
++  --ucl-coef 0.1 \
++  --maxsim-coef 0.05 \
++  --maxsim-temperature 0.3 \
++  --learning-rate 1e-3 \
++  --batch-size 64 \
++  --epochs 2 \
++  --warmup-steps 20000 \
++  --output-dir output/ssr-token \
++  "$@"
+diff --git a/scripts/train_issue1_setup.sh b/scripts/train_issue1_setup.sh
+new file mode 100644
+index 0000000..e7ca0f0
+--- /dev/null
++++ b/scripts/train_issue1_setup.sh
+@@ -0,0 +1,32 @@
++#!/usr/bin/env bash
++# Token SAE (SSR) with the training setup the authors describe in GitHub issue #1
++# (2026-07-25 / 2026-07-31), which differs from paper Table 6 in the learning rate:
++#   - BERT is fine-tuned (not frozen); lr ~1e-6 ("lr=0.001 is not the most stable setting");
++#   - 32 BM25 hard negatives per query -> 32 triplets, one query's triplets per batch
++#     (2 queries x 32 triplets at batch size 64); warmup 20000 steps (~4% of 2 epochs);
++#   - L_CE temperature 0.3; [MASK] query-expansion tokens are not used in MaxSim.
++# Batch 64 needs a large GPU (an 8 GB card runs out of memory); extra args are forwarded.
++set -euo pipefail
++
++python -m ssr.train \
++  --dataset msmarco-passage \
++  --data-dir data/processed/msmarco/passage \
++  --sample-format triplet \
++  --negatives-per-query 32 \
++  --model-name bert-base-uncased \
++  --sae-token-scope non-cls \
++  --n-latents 16384 \
++  --topk 32 \
++  --auxk 2048 \
++  --recon-coef 1.0 \
++  --recon-4k-coef 0.125 \
++  --auxk-coef 0.03125 \
++  --ucl-coef 0.1 \
++  --maxsim-coef 0.05 \
++  --maxsim-temperature 0.3 \
++  --learning-rate 1e-6 \
++  --batch-size 64 \
++  --epochs 2 \
++  --warmup-steps 20000 \
++  --output-dir output/ssr-token \
++  "$@"

@@ -1,0 +1,28 @@
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 9394.95it/s]
+D:\No-Kmeans-code-paper\repro\venv\Lib\site-packages\torch\nn\modules\module.py:1370: UserWarning: expandable_segments not supported on this platform (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\c10/cuda/CUDAAllocatorConfig.h:39.)
+  return t.to(
+D:\No-Kmeans-code-paper\repro\gpu_exact_score.py:73: UserWarning: Sparse invariant checks are implicitly disabled. Memory errors (e.g. SEGFAULT) will occur when operating on a sparse tensor which violates the invariants, but checks incur performance overhead. To silence this warning, explicitly opt in or out. See `torch.sparse.check_sparse_tensor_invariants.__doc__` for guidance.  (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\Context.cpp:767.)
+  D = torch.sparse_csr_tensor(
+[gpu] quora: 522931 docs, 7616364 doc tokens, nnz=234766310 (load+build 22s)
+[gpu] test: 1/10000 queries, 121.2 ms/query
+[gpu] test: 501/10000 queries, 76.0 ms/query
+[gpu] test: 1001/10000 queries, 76.4 ms/query
+[gpu] test: 1501/10000 queries, 79.4 ms/query
+[gpu] test: 2001/10000 queries, 76.8 ms/query
+[gpu] test: 2501/10000 queries, 75.4 ms/query
+[gpu] test: 3001/10000 queries, 74.0 ms/query
+[gpu] test: 3501/10000 queries, 73.6 ms/query
+[gpu] test: 4001/10000 queries, 74.1 ms/query
+[gpu] test: 4501/10000 queries, 73.6 ms/query
+[gpu] test: 5001/10000 queries, 73.0 ms/query
+[gpu] test: 5501/10000 queries, 73.4 ms/query
+[gpu] test: 6001/10000 queries, 72.9 ms/query
+[gpu] test: 6501/10000 queries, 72.6 ms/query
+[gpu] test: 7001/10000 queries, 72.5 ms/query
+[gpu] test: 7501/10000 queries, 72.9 ms/query
+[gpu] test: 8001/10000 queries, 72.9 ms/query
+[gpu] test: 8501/10000 queries, 73.4 ms/query
+[gpu] test: 9001/10000 queries, 73.3 ms/query
+[gpu] test: 9501/10000 queries, 95.6 ms/query
+[gpu] quora/test: nDCG@10 graded = 85.42 (10000 queries, 120.9 ms/query)
+[gpu] dev: 1/5000 queries, 58.3 ms/query

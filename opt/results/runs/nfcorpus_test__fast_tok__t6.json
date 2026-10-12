@@ -1,0 +1,54 @@
+{
+  "dataset": "nfcorpus",
+  "split": "test",
+  "method": "fast_tok",
+  "spec": "fast_tok",
+  "threads": 6,
+  "n_queries": 323,
+  "top_k": 100,
+  "exact": "yes (bit-identical)",
+  "ndcg@10": 0.43994927209964796,
+  "recall@100": 0.3696040211806054,
+  "recall@10": 0.23714867943857074,
+  "metrics": {
+    "accuracy@1": 0.6346749226006192,
+    "accuracy@10": 0.8823529411764706,
+    "accuracy@100": 0.9504643962848297,
+    "precision@1": 0.6346749226006192,
+    "recall@1": 0.09458066200200123,
+    "precision@10": 0.27616099071207434,
+    "recall@10": 0.23714867943857074,
+    "precision@100": 0.07486068111455109,
+    "recall@100": 0.3696040211806054,
+    "ndcg@10": 0.43994927209964796,
+    "map@100": 0.22331588116273143
+  },
+  "latency": {
+    "mean_ms": 6.973973993848034,
+    "p50_ms": 5.212500000197906,
+    "p95_ms": 17.220020000968347,
+    "max_ms": 32.70899999915855,
+    "n_timed": 323
+  },
+  "index": {
+    "build_s": 0.5369839000013599,
+    "build_parts": {
+      "forward+mu": 0.45393410000178847,
+      "token_postings": 0.0830497999995714
+    },
+    "index_mb": {
+      "forward": 206.705552,
+      "mu": 53.82048,
+      "token_postings": 285.68052
+    },
+    "n_shards": 114,
+    "shard_docs": 32
+  },
+  "build_wall_s": 3.529999958118424e-05,
+  "rss_gb": 1.443192832,
+  "peak_gb": 1.674932224,
+  "other_eval_procs": [],
+  "cpu": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+  "numba_threading_layer": "omp",
+  "tag": "small"
+}

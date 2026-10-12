@@ -1,0 +1,23 @@
+{
+  "fiqa": {
+    "accuracy@1": 0.187,
+    "accuracy@10": 0.415,
+    "accuracy@100": 0.692,
+    "precision@1": 0.187,
+    "recall@1": 0.09737589997721577,
+    "precision@10": 0.056100000000000004,
+    "recall@10": 0.264940875875295,
+    "precision@100": 0.011269999999999999,
+    "recall@100": 0.5095500181146533,
+    "ndcg@10": 0.20910714019179283,
+    "map@100": 0.1710236596528657,
+    "retrieval_index_seconds": 40.87757889999921,
+    "retrieval_score_seconds": 1806.3625623000025,
+    "retrieval_wall_seconds": 1847.2436120999992,
+    "retrieval_seconds_per_query": 1.8063625623000026,
+    "retrieval_score_seconds_per_query": 1.8063625623000026,
+    "retrieval_n_queries": 1000.0,
+    "retrieval_n_index_builds": 12.0,
+    "retrieval_total_seconds": 1847.2436120999992
+  }
+}

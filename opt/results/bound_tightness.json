@@ -1,0 +1,30 @@
+{
+  "nfcorpus:test": {
+    "theta_per_token": 0.22167353332042694,
+    "mean_s_i_top100": 0.25040096044540405,
+    "mean_s_i_others": 0.14202967286109924,
+    "mu: frac_docs_ub>=theta": 0.9763969171483623,
+    "mu: slack_per_token": 0.3420110959559679,
+    "T=4: frac_docs_ub>=theta": 0.9687173135150013,
+    "T=4: slack_per_token": 0.2950754392892122,
+    "T=8: frac_docs_ub>=theta": 0.9470066061106523,
+    "T=8: slack_per_token": 0.23372194878757,
+    "T=16: frac_docs_ub>=theta": 0.788150289017341,
+    "T=16: slack_per_token": 0.13577046310529112,
+    "n_queries": 40
+  },
+  "scifact:train": {
+    "theta_per_token": 0.3237172067165375,
+    "mean_s_i_top100": 0.34700363874435425,
+    "mean_s_i_others": 0.2333330661058426,
+    "mu: frac_docs_ub>=theta": 0.993387034535983,
+    "mu: slack_per_token": 0.508875758945942,
+    "T=4: frac_docs_ub>=theta": 0.9907582481188502,
+    "T=4: slack_per_token": 0.4544855311512947,
+    "T=8: frac_docs_ub>=theta": 0.9830214161682423,
+    "T=8: slack_per_token": 0.3742120549082756,
+    "T=16: frac_docs_ub>=theta": 0.9259550453405364,
+    "T=16: slack_per_token": 0.22456281557679175,
+    "n_queries": 40
+  }
+}

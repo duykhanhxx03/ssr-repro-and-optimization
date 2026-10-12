@@ -1,0 +1,5 @@
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 9215.40it/s]
+[backbone-dense] nfcorpus/test: nDCG@10 graded = 23.71 (323 queries)
+[backbone-dense] nfcorpus/dev: nDCG@10 graded = 20.67 (324 queries)
+[backbone-dense] nfcorpus/train: nDCG@10 graded = 21.75 (2590 queries)
+[backbone-dense] nfcorpus: corpus encode+score 49s

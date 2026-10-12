@@ -1,0 +1,19 @@
+# Dữ liệu, cache và mô hình (tải lại theo README)
+data/
+cache/
+ckpt/
+hf_cache/
+tmp/
+opt/tmp/
+opt/qcache/
+
+# Môi trường Python
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# File tạm
+*.bak
+*.tmp

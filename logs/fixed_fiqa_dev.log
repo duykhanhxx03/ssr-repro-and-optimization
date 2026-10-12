@@ -1,0 +1,30 @@
+2026-10-11 21:21:10,607 [INFO] mode=exact+sparse-cache | encode=cuda | score=index | cuda_available=True | gpu_name=NVIDIA GeForce RTX 5060
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 8817.33it/s]
+2026-10-11 21:21:11,135 [INFO] Evaluation variant: SSR
+2026-10-11 21:21:11,135 [INFO] === Evaluating fiqa (FiQA2018) ===
+2026-10-11 21:21:11,136 [INFO] Metrics for fiqa: mrr@[] ndcg@[10]
+2026-10-11 21:21:11,351 [INFO] Loading cached corpus embeddings: D:\No-Kmeans-code-paper\repro\cache\fixed\fiqa\corpus_32k_dev.npz
+2026-10-11 21:21:21,484 [INFO] Encoding queries (500) ...
+Encode queries:   0%|          | 0/63 [00:00<?, ?it/s]Encode queries:   2%|▏         | 1/63 [00:00<00:56,  1.09it/s]Encode queries:   5%|▍         | 3/63 [00:01<00:16,  3.56it/s]Encode queries:  10%|▉         | 6/63 [00:01<00:07,  7.69it/s]Encode queries:  17%|█▋        | 11/63 [00:01<00:03, 15.39it/s]Encode queries:  27%|██▋       | 17/63 [00:01<00:01, 24.04it/s]Encode queries:  35%|███▍      | 22/63 [00:01<00:01, 29.78it/s]Encode queries:  43%|████▎     | 27/63 [00:01<00:01, 27.48it/s]Encode queries:  52%|█████▏    | 33/63 [00:01<00:00, 33.44it/s]Encode queries:  62%|██████▏   | 39/63 [00:01<00:00, 38.20it/s]Encode queries:  71%|███████▏  | 45/63 [00:02<00:00, 41.76it/s]Encode queries:  81%|████████  | 51/63 [00:02<00:00, 44.45it/s]Encode queries:  90%|█████████ | 57/63 [00:02<00:00, 47.19it/s]Encode queries: 100%|██████████| 63/63 [00:02<00:00, 47.25it/s]Encode queries: 100%|██████████| 63/63 [00:02<00:00, 26.68it/s]
+Exact retrieve [index-first, CPU index]:   0%|          | 0/12 [00:00<?, ?it/s]Exact retrieve [index-first, CPU index]:   8%|▊         | 1/12 [01:23<15:22, 83.85s/it]Exact retrieve [index-first, CPU index]:  17%|█▋        | 2/12 [02:50<14:12, 85.25s/it]Exact retrieve [index-first, CPU index]:  25%|██▌       | 3/12 [04:16<12:50, 85.58s/it]Exact retrieve [index-first, CPU index]:  33%|███▎      | 4/12 [05:45<11:35, 86.91s/it]Exact retrieve [index-first, CPU index]:  42%|████▏     | 5/12 [07:06<09:55, 85.06s/it]Exact retrieve [index-first, CPU index]:  50%|█████     | 6/12 [08:32<08:31, 85.24s/it]Exact retrieve [index-first, CPU index]:  58%|█████▊    | 7/12 [09:51<06:56, 83.31s/it]Exact retrieve [index-first, CPU index]:  67%|██████▋   | 8/12 [11:07<05:23, 80.80s/it]Exact retrieve [index-first, CPU index]:  75%|███████▌  | 9/12 [12:25<04:00, 80.17s/it]Exact retrieve [index-first, CPU index]:  83%|████████▎ | 10/12 [13:41<02:37, 78.85s/it]Exact retrieve [index-first, CPU index]:  92%|█████████▏| 11/12 [14:56<01:17, 77.45s/it]Exact retrieve [index-first, CPU index]: 100%|██████████| 12/12 [15:32<00:00, 65.10s/it]Exact retrieve [index-first, CPU index]: 100%|██████████| 12/12 [15:32<00:00, 77.75s/it]
+2026-10-11 21:36:56,818 [INFO] Retrieval timing [fiqa]: index_build=43.006s (12 shard-ingests) | retrieve_score=889.935s | wall=932.945s | per-query_score=1.7799s (n_queries=500)
+2026-10-11 21:36:57,135 [INFO]   accuracy@1: 0.2060
+2026-10-11 21:36:57,135 [INFO]   accuracy@10: 0.4500
+2026-10-11 21:36:57,135 [INFO]   accuracy@100: 0.7060
+2026-10-11 21:36:57,135 [INFO]   map@100: 0.1850
+2026-10-11 21:36:57,135 [INFO]   ndcg@10: 0.2280
+2026-10-11 21:36:57,135 [INFO]   precision@1: 0.2060
+2026-10-11 21:36:57,135 [INFO]   precision@10: 0.0604
+2026-10-11 21:36:57,135 [INFO]   precision@100: 0.0117
+2026-10-11 21:36:57,135 [INFO]   recall@1: 0.1102
+2026-10-11 21:36:57,135 [INFO]   recall@10: 0.2918
+2026-10-11 21:36:57,135 [INFO]   recall@100: 0.5138
+2026-10-11 21:36:57,135 [INFO]   retrieval_index_seconds: 43.0059
+2026-10-11 21:36:57,135 [INFO]   retrieval_n_index_builds: 12.0000
+2026-10-11 21:36:57,135 [INFO]   retrieval_n_queries: 500.0000
+2026-10-11 21:36:57,135 [INFO]   retrieval_score_seconds: 889.9353
+2026-10-11 21:36:57,135 [INFO]   retrieval_score_seconds_per_query: 1.7799
+2026-10-11 21:36:57,135 [INFO]   retrieval_seconds_per_query: 1.7799
+2026-10-11 21:36:57,135 [INFO]   retrieval_total_seconds: 932.9447
+2026-10-11 21:36:57,136 [INFO]   retrieval_wall_seconds: 932.9447
+2026-10-11 21:36:57,136 [INFO] Wrote metrics to results\fixed_fiqa_dev.json

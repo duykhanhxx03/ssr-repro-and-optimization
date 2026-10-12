@@ -1,0 +1,17 @@
+fiqa:dev docs=57638 queries=500 load=9.4s rss=3.05GB
+[fast_hyb t=6] nDCG@10=22.80 R@100=51.38 mean=82.22ms p50=78.79 p95=130.93 build=2.6448032000007515 rss=5.21GB
+[fast_ssrpp-kc4-n2000 t=6] nDCG@10=18.11 R@100=33.10 mean=18.13ms p50=17.91 p95=26.35 build=2.6448032000007515 rss=5.22GB
+[fast_ssrpp-kc4-n5000 t=6] nDCG@10=20.60 R@100=42.20 mean=35.12ms p50=34.65 p95=49.75 build=2.6448032000007515 rss=5.22GB
+[fast_ssrpp-kc4-n10000 t=6] nDCG@10=22.25 R@100=48.74 mean=60.12ms p50=59.01 p95=88.95 build=2.6448032000007515 rss=5.22GB
+[fast_ssrpp-kc8-n2000 t=6] nDCG@10=18.01 R@100=33.53 mean=21.51ms p50=21.39 p95=31.29 build=2.6448032000007515 rss=5.22GB
+[fast_ssrpp-kc8-n5000 t=6] nDCG@10=20.53 R@100=41.60 mean=39.30ms p50=38.37 p95=56.55 build=2.6448032000007515 rss=5.22GB
+[fast_ssrpp-kc32-n2000 t=6] nDCG@10=16.30 R@100=29.83 mean=30.37ms p50=30.03 p95=43.38 build=2.6448032000007515 rss=5.22GB
+[fast_ssrpp-kc32-n5000 t=6] nDCG@10=20.32 R@100=39.90 mean=48.57ms p50=47.89 p95=67.56 build=2.6448032000007515 rss=5.22GB
+[fast_lb-t2-n1000 t=6] nDCG@10=18.82 R@100=34.92 mean=33.41ms p50=32.02 p95=53.70 build=2.6448032000007515 rss=5.22GB
+[fast_lb-t4-n500 t=6] nDCG@10=21.03 R@100=41.49 mean=39.40ms p50=37.94 p95=63.08 build=2.6448032000007515 rss=5.22GB
+[fast_lb-t4-n1000 t=6] nDCG@10=22.40 R@100=46.23 mean=42.76ms p50=41.68 p95=69.03 build=2.6448032000007515 rss=5.22GB
+[fast_lb-t4-n2000 t=6] nDCG@10=22.58 R@100=48.52 mean=48.67ms p50=47.62 p95=76.48 build=2.6448032000007515 rss=5.22GB
+[fast_lb-t8-n500 t=6] nDCG@10=22.83 R@100=50.06 mean=52.11ms p50=50.29 p95=79.90 build=2.6448032000007515 rss=5.22GB
+[fast_lb-t8-n1000 t=6] nDCG@10=22.81 R@100=50.72 mean=55.21ms p50=53.92 p95=87.05 build=2.6448032000007515 rss=5.22GB
+[fast_lb-t8-n2000 t=6] nDCG@10=22.80 R@100=51.32 mean=61.40ms p50=59.63 p95=95.31 build=2.6448032000007515 rss=5.22GB
+[fast_lb-t16-n1000 t=6] nDCG@10=22.80 R@100=51.38 mean=70.86ms p50=70.47 p95=110.00 build=2.6448032000007515 rss=5.22GB

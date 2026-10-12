@@ -1,0 +1,6 @@
+nfcorpus:test docs=3633 queries=323 load=1.3s rss=1.09GB
+[fast_lat t=6] nDCG@10=43.99 R@100=36.96 mean=3.87ms p50=3.15 p95=7.91 build=0.5369839000013599 rss=1.42GB
+[fast_tok t=6] nDCG@10=43.99 R@100=36.96 mean=6.97ms p50=5.21 p95=17.22 build=0.5369839000013599 rss=1.44GB
+[fast_ub t=6] nDCG@10=44.04 R@100=36.96 mean=14.48ms p50=14.10 p95=20.41 build=0.5369839000013599 rss=1.44GB
+[gpu_exact t=0] nDCG@10=43.96 R@100=36.96 mean=7.53ms p50=7.44 p95=7.89 build=0.7955618999985745 rss=1.73GB
+[fast_lb-t4-n1000 t=6] nDCG@10=43.89 R@100=37.03 mean=5.65ms p50=5.42 p95=8.21 build=0.5369839000013599 rss=1.73GB

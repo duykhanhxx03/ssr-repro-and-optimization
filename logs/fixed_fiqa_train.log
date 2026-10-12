@@ -1,0 +1,6 @@
+2026-10-11 21:37:04,010 [INFO] mode=exact+sparse-cache | encode=cuda | score=index | cuda_available=True | gpu_name=NVIDIA GeForce RTX 5060
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 10182.46it/s]
+2026-10-11 21:37:04,500 [INFO] Evaluation variant: SSR
+2026-10-11 21:37:04,501 [INFO] === Evaluating fiqa (FiQA2018) ===
+2026-10-11 21:37:04,501 [INFO] Metrics for fiqa: mrr@[] ndcg@[10]
+2026-10-11 21:37:04,711 [INFO] Loading cached corpus embeddings: D:\No-Kmeans-code-paper\repro\cache\fixed\fiqa\corpus_32k_train.npz

@@ -1,0 +1,32 @@
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 9639.63it/s]
+[ssr] 256/7023 queries (169s)
+[ssr] 1536/7023 queries (565s)
+[ssr] 2816/7023 queries (979s)
+[ssr] 4096/7023 queries (1398s)
+[ssr] 5376/7023 queries (1820s)
+[ssr] 6656/7023 queries (2237s)
+[ssr] dev-small: MRR@10 = 23.18, nDCG@10 = 28.29 (6980 queries)
+[ssr] TREC-DL19: MRR@10 = 69.06, nDCG@10 = 57.96 (43 queries)
+[ssr] done in 2359s
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 14395.52it/s]
+[colbertv2] 256/7023 queries (36s)
+[colbertv2] 1536/7023 queries (193s)
+[colbertv2] 2816/7023 queries (348s)
+[colbertv2] 4096/7023 queries (504s)
+[colbertv2] 5376/7023 queries (663s)
+[colbertv2] 6656/7023 queries (819s)
+[colbertv2] dev-small: MRR@10 = 35.86, nDCG@10 = 40.92 (6980 queries)
+[colbertv2] TREC-DL19: MRR@10 = 85.27, nDCG@10 = 72.72 (43 queries)
+[colbertv2] done in 864s
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 14374.69it/s]
+[backbone] 256/7023 queries (84s)
+[backbone] 1536/7023 queries (487s)
+[backbone] 2816/7023 queries (901s)
+[backbone] 4096/7023 queries (1321s)
+[backbone] 5376/7023 queries (1746s)
+[backbone] 6656/7023 queries (2165s)
+[backbone] dev-small: MRR@10 = 15.94, nDCG@10 = 20.34 (6980 queries)
+[backbone] TREC-DL19: MRR@10 = 65.20, nDCG@10 = 47.43 (43 queries)
+[backbone] done in 2287s
+exit=0

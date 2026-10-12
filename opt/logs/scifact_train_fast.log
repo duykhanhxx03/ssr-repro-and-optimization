@@ -1,0 +1,7 @@
+scifact:train docs=5183 queries=809 load=1.8s rss=1.20GB
+[fast_hyb t=1] nDCG@10=69.39 R@100=92.84 mean=50.76ms p50=46.22 p95=88.17 build=1.0328335000012885 rss=1.62GB
+[fast_hyb t=6] nDCG@10=69.39 R@100=92.84 mean=17.71ms p50=15.54 p95=33.22 build=1.0328335000012885 rss=1.65GB
+[fast_hyb t=12] nDCG@10=69.39 R@100=92.84 mean=12.80ms p50=10.36 p95=25.73 build=1.0328335000012885 rss=1.65GB
+[fast_ssrpp t=1] nDCG@10=69.35 R@100=91.98 mean=45.09ms p50=43.28 p95=62.84 build=1.0328335000012885 rss=1.65GB
+[fast_ssrpp t=6] nDCG@10=69.35 R@100=91.98 mean=14.18ms p50=13.90 p95=20.49 build=1.0328335000012885 rss=1.65GB
+[fast_ssrpp t=12] nDCG@10=69.35 R@100=91.98 mean=9.52ms p50=9.02 p95=13.94 build=1.0328335000012885 rss=1.65GB

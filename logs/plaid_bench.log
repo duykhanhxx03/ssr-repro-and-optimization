@@ -1,0 +1,31 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 11616.95it/s]
+[plaid] index cuda: build 32.6s, 603 MiB, encode 284s
+[plaid] test cuda: {'ndcg@10': 35.72723770219205, 'mean_ms': 44.69831496911596, 'p50_ms': 44.44265000165615, 'p95_ms': 51.1486999985209, 'n_queries': 648}
+[plaid] dev cuda: {'ndcg@10': 34.93386871902311, 'mean_ms': 44.17665560000023, 'p50_ms': 44.070749998354586, 'p95_ms': 50.740054999187116, 'n_queries': 500}
+{
+  "system": "ColBERTv2 + PLAID (fast-plaid, nbits=2)",
+  "encode_s": 284.0967457294464,
+  "index_build_s_cuda": 32.60222673416138,
+  "index_bytes": 632012000,
+  "test_cuda": {
+    "ndcg@10": 35.72723770219205,
+    "mean_ms": 44.69831496911596,
+    "p50_ms": 44.44265000165615,
+    "p95_ms": 51.1486999985209,
+    "n_queries": 648
+  },
+  "dev_cuda": {
+    "ndcg@10": 34.93386871902311,
+    "mean_ms": 44.17665560000023,
+    "p50_ms": 44.070749998354586,
+    "p95_ms": 50.740054999187116,
+    "n_queries": 500
+  },
+  "cpu_threads": 12,
+  "gpu": "NVIDIA GeForce RTX 5060",
+  "dataset": "fiqa",
+  "n_docs": 57638
+}
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 13464.97it/s]
+exit=127

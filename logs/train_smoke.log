@@ -1,0 +1,52 @@
+2026-10-12 06:15:32,309 - INFO - Training device: cuda ({'cuda_visible_devices': None, 'physical_gpu': None, 'torch_cuda_available': True, 'torch_version': '2.11.0+cu128', 'torch_cuda_version': '12.8', 'gpu_name': 'NVIDIA GeForce RTX 5060', 'gpu_count_visible': 1})
+2026-10-12 06:15:32,309 - INFO - Building SSR model from bert-base-uncased
+2026-10-12 06:15:32,721 - INFO - HTTP Request: HEAD https://huggingface.co/bert-base-uncased/resolve/main/adapter_config.json "HTTP/1.1 404 Not Found"
+2026-10-12 06:15:32,965 - INFO - HTTP Request: HEAD https://huggingface.co/bert-base-uncased/resolve/main/config.json "HTTP/1.1 200 OK"
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 13808.47it/s]
+[1mBertModel LOAD REPORT[0m from: bert-base-uncased
+Key                                        | Status     |  | 
+-------------------------------------------+------------+--+-
+cls.predictions.transform.dense.weight     | UNEXPECTED |  | 
+cls.predictions.bias                       | UNEXPECTED |  | 
+cls.predictions.transform.LayerNorm.bias   | UNEXPECTED |  | 
+cls.seq_relationship.bias                  | UNEXPECTED |  | 
+cls.predictions.transform.dense.bias       | UNEXPECTED |  | 
+cls.predictions.transform.LayerNorm.weight | UNEXPECTED |  | 
+cls.seq_relationship.weight                | UNEXPECTED |  | 
+
+[3mNotes:
+- UNEXPECTED[3m	:can be ignored when loading from different task/architecture; not ok if you expect identical arch.[0m
+2026-10-12 06:15:33,312 - INFO - HTTP Request: HEAD https://huggingface.co/bert-base-uncased/resolve/main/config.json "HTTP/1.1 200 OK"
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-10-12 06:15:33,312 - WARNING - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-10-12 06:15:33,564 - INFO - HTTP Request: HEAD https://huggingface.co/bert-base-uncased/resolve/main/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-10-12 06:15:33,812 - INFO - HTTP Request: GET https://huggingface.co/api/models/bert-base-uncased/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 307 Temporary Redirect"
+2026-10-12 06:15:34,063 - INFO - HTTP Request: GET https://huggingface.co/api/models/google-bert/bert-base-uncased/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-10-12 06:15:34,301 - INFO - HTTP Request: GET https://huggingface.co/api/models/bert-base-uncased/tree/main?recursive=true&expand=false "HTTP/1.1 307 Temporary Redirect"
+2026-10-12 06:15:34,544 - INFO - HTTP Request: GET https://huggingface.co/api/models/google-bert/bert-base-uncased/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+The new embeddings will be initialized from a multivariate normal distribution that has old embeddings' mean and covariance. As described in this article: https://nlp.stanford.edu/~johnhew/vocab-expansion.html. To disable this, use `mean_resizing=False`
+2026-10-12 06:15:35,291 - INFO - sample_format=triplet | loss weights: recon=1.0 recon_4k=0.125 auxk=0.03125 ucl=0.1 maxsim=0.05
+2026-10-12 06:15:35,291 - INFO - SAE token scope: non-cls
+2026-10-12 06:15:35,291 - INFO - Loading hard_negatives train: ..\tmp\train_smoke\hard_negatives\train.jsonl
+2026-10-12 06:15:35,292 - INFO - split=train triplet samples: 64
+2026-10-12 06:15:35,295 - INFO - Loading hard_negatives validation: ..\tmp\train_smoke\hard_negatives\validation.jsonl
+2026-10-12 06:15:35,295 - INFO - split=validation triplet samples: 2
+2026-10-12 06:15:35,298 - INFO - Train samples: 64, eval samples: 2
+2026-10-12 06:15:35,298 - INFO - skip_triplet_eval: skipping ColBERTTripletEvaluator (trainer eval loss kept)
+2026-10-12 06:15:35,371 - INFO - Starting training ...
+  0%|          | 0/4 [00:00<?, ?it/s] 25%|██▌       | 1/4 [00:20<01:02, 20.83s/it]                                              25%|██▌       | 1/4 [00:20<01:02, 20.83s/it] 50%|█████     | 2/4 [00:32<00:30, 15.23s/it]                                              50%|█████     | 2/4 [00:32<00:30, 15.23s/it] 75%|███████▌  | 3/4 [00:46<00:14, 14.69s/it]                                              75%|███████▌  | 3/4 [00:46<00:14, 14.69s/it]100%|██████████| 4/4 [00:54<00:00, 12.30s/it]                                             100%|██████████| 4/4 [00:54<00:00, 12.30s/it]2026-10-12 06:16:31,013 - INFO - Saving model checkpoint to ..\tmp\train_smoke\out\checkpoint-4
+2026-10-12 06:16:31,013 - INFO - Save model to ..\tmp\train_smoke\out\checkpoint-4
+{'loss': '0.617', 'grad_norm': '1.107', 'learning_rate': '0', 'unsupervised_cl': '0.1743', 'reconstruction': '0.2306', 'reconstruction_4k': '0.0174', 'auxk': '0.0416', 'maxsim': '0.1531', 'epoch': '0.25'}
+{'loss': '0.6047', 'grad_norm': '1.084', 'learning_rate': '5e-07', 'unsupervised_cl': '0.1777', 'reconstruction': '0.2298', 'reconstruction_4k': '0.0174', 'auxk': '0.0414', 'maxsim': '0.1383', 'epoch': '0.5'}
+{'loss': '0.6224', 'grad_norm': '1.348', 'learning_rate': '1e-06', 'unsupervised_cl': '0.1804', 'reconstruction': '0.2398', 'reconstruction_4k': '0.0181', 'auxk': '0.0447', 'maxsim': '0.1394', 'epoch': '0.75'}
+{'loss': '0.6009', 'grad_norm': '1.061', 'learning_rate': '5e-07', 'unsupervised_cl': '0.173', 'reconstruction': '0.2177', 'reconstruction_4k': '0.0165', 'auxk': '0.0403', 'maxsim': '0.1534', 'epoch': '1'}
+
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s][A
+Writing model shards: 100%|██████████| 1/1 [00:00<00:00,  4.22it/s][AWriting model shards: 100%|██████████| 1/1 [00:00<00:00,  4.22it/s]
+2026-10-12 06:16:31,583 - INFO - HTTP Request: GET https://huggingface.co/api/models/bert-base-uncased "HTTP/1.1 307 Temporary Redirect"
+2026-10-12 06:16:31,838 - INFO - HTTP Request: GET https://huggingface.co/api/models/google-bert/bert-base-uncased "HTTP/1.1 200 OK"
+                                             100%|██████████| 4/4 [00:56<00:00, 12.30s/it]100%|██████████| 4/4 [00:56<00:00, 14.15s/it]
+2026-10-12 06:16:32,713 - INFO - Save model to ..\tmp\train_smoke\out\final
+{'train_runtime': '57.23', 'train_samples_per_second': '1.118', 'train_steps_per_second': '0.07', 'train_loss': '0.6112', 'epoch': '1'}
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00,  4.76it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00,  4.75it/s]
+2026-10-12 06:16:32,989 - INFO - Saved model to ..\tmp\train_smoke\out\final

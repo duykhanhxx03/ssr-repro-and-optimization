@@ -1,0 +1,50 @@
+{
+  "dataset": "nfcorpus",
+  "split": "dev",
+  "method": "repo_exact",
+  "spec": "repo_exact",
+  "threads": 1,
+  "n_queries": 324,
+  "top_k": 100,
+  "exact": "yes (reference)",
+  "ndcg@10": 0.274122250033333,
+  "recall@100": 0.26176934690834414,
+  "recall@10": 0.128795108981125,
+  "metrics": {
+    "accuracy@1": 0.3888888888888889,
+    "accuracy@10": 0.6419753086419753,
+    "accuracy@100": 0.8209876543209876,
+    "precision@1": 0.3888888888888889,
+    "recall@1": 0.028286092709466124,
+    "precision@10": 0.21265432098765433,
+    "recall@10": 0.128795108981125,
+    "precision@100": 0.06228395061728395,
+    "recall@100": 0.26176934690834414,
+    "ndcg@10": 0.274122250033333,
+    "map@100": 0.12103319719493554
+  },
+  "latency": null,
+  "index": {
+    "build_s": 5.387051899999278
+  },
+  "build_wall_s": 0.0019632999992609257,
+  "rss_gb": 1.124646912,
+  "peak_gb": 3.912613888,
+  "other_eval_procs": [],
+  "cpu": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+  "numba_threading_layer": "omp",
+  "tag": "small",
+  "wall_s": 19.208076699998855,
+  "repo_timing": {
+    "retrieval_index_seconds": 5.387051899999278,
+    "retrieval_score_seconds": 13.80037590000029,
+    "retrieval_wall_seconds": 19.18744719999995,
+    "retrieval_seconds_per_query": 0.04259375277777867,
+    "retrieval_score_seconds_per_query": 0.04259375277777867,
+    "retrieval_n_queries": 324.0,
+    "retrieval_n_index_builds": 1.0,
+    "retrieval_total_seconds": 19.18744719999995
+  },
+  "mean_ms_incl_index_build": 59.28418734567548,
+  "mean_ms_scoring_only": 42.593752777778676
+}

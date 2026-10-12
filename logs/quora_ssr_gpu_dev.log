@@ -1,0 +1,17 @@
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 5073.65it/s]
+D:\No-Kmeans-code-paper\repro\venv\Lib\site-packages\torch\nn\modules\module.py:1370: UserWarning: expandable_segments not supported on this platform (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\c10/cuda/CUDAAllocatorConfig.h:39.)
+  return t.to(
+D:\No-Kmeans-code-paper\repro\gpu_exact_score.py:73: UserWarning: Sparse invariant checks are implicitly disabled. Memory errors (e.g. SEGFAULT) will occur when operating on a sparse tensor which violates the invariants, but checks incur performance overhead. To silence this warning, explicitly opt in or out. See `torch.sparse.check_sparse_tensor_invariants.__doc__` for guidance.  (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\Context.cpp:767.)
+  D = torch.sparse_csr_tensor(
+[gpu] quora: 522931 docs, 7616364 doc tokens, nnz=234766310 (load+build 25s)
+[gpu] dev: 1/5000 queries, 134.7 ms/query
+[gpu] dev: 501/5000 queries, 86.6 ms/query
+[gpu] dev: 1001/5000 queries, 73.0 ms/query
+[gpu] dev: 1501/5000 queries, 76.6 ms/query
+[gpu] dev: 2001/5000 queries, 80.3 ms/query
+[gpu] dev: 2501/5000 queries, 77.4 ms/query
+[gpu] dev: 3001/5000 queries, 75.0 ms/query
+[gpu] dev: 3501/5000 queries, 75.3 ms/query
+[gpu] dev: 4001/5000 queries, 74.6 ms/query
+[gpu] dev: 4501/5000 queries, 75.0 ms/query
+[gpu] quora/dev: nDCG@10 graded = 82.16 (5000 queries, 74.2 ms/query)

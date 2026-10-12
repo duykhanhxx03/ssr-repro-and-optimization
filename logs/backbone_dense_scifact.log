@@ -1,0 +1,4 @@
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 8336.24it/s]
+[backbone-dense] scifact/test: nDCG@10 graded = 69.55 (300 queries)
+[backbone-dense] scifact/train: nDCG@10 graded = 66.26 (809 queries)
+[backbone-dense] scifact: corpus encode+score 74s

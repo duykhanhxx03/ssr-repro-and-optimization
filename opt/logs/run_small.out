@@ -1,0 +1,82 @@
+nfcorpus:test docs=3633 queries=323 load=1.4s rss=1.09GB
+[base_exact t=1] nDCG@10=43.99 R@100=36.96 mean=44.09ms p50=30.41 p95=110.78 build=6.177919499999916 rss=1.63GB
+[base_ssrpp t=1] nDCG@10=43.94 R@100=37.02 mean=29.42ms p50=21.22 p95=73.53 build=6.177919499999916 rss=1.68GB
+nfcorpus:test docs=3633 queries=323 load=1.3s rss=1.09GB
+[repo_exact t=1] nDCG@10=43.97 R@100=36.96 mean(batch,incl build)=60.2ms build=5.320656899999449 rss=1.13GB
+[repo_ssrpp t=1] nDCG@10=43.98 R@100=37.02 mean(batch,incl build)=84.2ms build=None rss=1.14GB
+nfcorpus:test docs=3633 queries=323 load=1.3s rss=1.09GB
+[fast_lat t=1] nDCG@10=43.99 R@100=36.96 mean=14.62ms p50=12.57 p95=28.17 build=0.8123598000001948 rss=1.69GB
+[fast_lat t=6] nDCG@10=43.99 R@100=36.96 mean=4.20ms p50=3.55 p95=8.35 build=0.8123598000001948 rss=1.70GB
+[fast_lat t=12] nDCG@10=43.99 R@100=36.96 mean=3.00ms p50=2.69 p95=5.65 build=0.8123598000001948 rss=1.71GB
+[fast_ssrpp t=1] nDCG@10=43.94 R@100=37.02 mean=36.12ms p50=31.75 p95=63.66 build=0.8123598000001948 rss=1.71GB
+[fast_ssrpp t=6] nDCG@10=43.94 R@100=37.02 mean=10.27ms p50=9.18 p95=17.20 build=0.8123598000001948 rss=1.71GB
+[fast_ssrpp t=12] nDCG@10=43.94 R@100=37.02 mean=6.73ms p50=6.01 p95=11.40 build=0.8123598000001948 rss=1.71GB
+nfcorpus:test docs=3633 queries=323 load=1.3s rss=1.09GB
+[fast_tok t=6] nDCG@10=43.99 R@100=36.96 mean=7.37ms p50=5.33 p95=17.39 build=0.5677038000012544 rss=1.71GB
+[fast_ub t=6] nDCG@10=44.04 R@100=36.96 mean=18.71ms p50=16.66 p95=32.00 build=0.5677038000012544 rss=1.71GB
+D:\No-Kmeans-code-paper\repro\opt\ssr_opt\gpu_exact.py:45: UserWarning: Sparse invariant checks are implicitly disabled. Memory errors (e.g. SEGFAULT) will occur when operating on a sparse tensor which violates the invariants, but checks incur performance overhead. To silence this warning, explicitly opt in or out. See `torch.sparse.check_sparse_tensor_invariants.__doc__` for guidance.  (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\Context.cpp:767.)
+  self.A = torch.sparse_csr_tensor(  # int32 crow + col (must match)
+[gpu_exact t=0] nDCG@10=43.96 R@100=36.96 mean=6.82ms p50=6.73 p95=7.25 build=0.8278913000012835 rss=2.02GB
+[fast_lb-t4-n1000 t=6] nDCG@10=43.89 R@100=37.03 mean=6.89ms p50=6.20 p95=11.81 build=0.5677038000012544 rss=2.03GB
+nfcorpus:dev docs=3633 queries=324 load=1.3s rss=1.09GB
+[base_exact t=1] nDCG@10=27.37 R@100=26.18 mean=41.70ms p50=29.53 p95=105.21 build=5.71063729999878 rss=1.63GB
+[base_ssrpp t=1] nDCG@10=27.39 R@100=25.95 mean=28.55ms p50=20.38 p95=71.00 build=5.71063729999878 rss=1.68GB
+nfcorpus:dev docs=3633 queries=324 load=1.3s rss=1.09GB
+[repo_exact t=1] nDCG@10=27.41 R@100=26.18 mean(batch,incl build)=59.3ms build=5.387051899999278 rss=1.13GB
+[repo_ssrpp t=1] nDCG@10=27.39 R@100=25.95 mean(batch,incl build)=86.1ms build=None rss=1.15GB
+nfcorpus:dev docs=3633 queries=324 load=1.3s rss=1.09GB
+[fast_lat t=1] nDCG@10=27.37 R@100=26.18 mean=15.12ms p50=13.35 p95=29.08 build=0.8560435000017605 rss=1.69GB
+[fast_lat t=6] nDCG@10=27.37 R@100=26.18 mean=4.32ms p50=3.71 p95=8.24 build=0.8560435000017605 rss=1.70GB
+[fast_lat t=12] nDCG@10=27.37 R@100=26.18 mean=2.85ms p50=2.46 p95=5.35 build=0.8560435000017605 rss=1.70GB
+[fast_ssrpp t=1] nDCG@10=27.39 R@100=25.95 mean=38.73ms p50=34.48 p95=67.01 build=0.8560435000017605 rss=1.71GB
+[fast_ssrpp t=6] nDCG@10=27.39 R@100=25.95 mean=10.38ms p50=9.46 p95=16.71 build=0.8560435000017605 rss=1.71GB
+[fast_ssrpp t=12] nDCG@10=27.39 R@100=25.95 mean=6.94ms p50=6.19 p95=11.42 build=0.8560435000017605 rss=1.71GB
+nfcorpus:dev docs=3633 queries=324 load=1.3s rss=1.09GB
+[fast_tok t=6] nDCG@10=27.37 R@100=26.18 mean=7.43ms p50=5.56 p95=17.06 build=0.5489015000002837 rss=1.71GB
+[fast_ub t=6] nDCG@10=27.39 R@100=26.18 mean=18.89ms p50=17.06 p95=30.89 build=0.5489015000002837 rss=1.72GB
+D:\No-Kmeans-code-paper\repro\opt\ssr_opt\gpu_exact.py:45: UserWarning: Sparse invariant checks are implicitly disabled. Memory errors (e.g. SEGFAULT) will occur when operating on a sparse tensor which violates the invariants, but checks incur performance overhead. To silence this warning, explicitly opt in or out. See `torch.sparse.check_sparse_tensor_invariants.__doc__` for guidance.  (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\Context.cpp:767.)
+  self.A = torch.sparse_csr_tensor(  # int32 crow + col (must match)
+[gpu_exact t=0] nDCG@10=27.37 R@100=26.18 mean=6.81ms p50=6.79 p95=7.20 build=0.826401899999837 rss=2.04GB
+[fast_lb-t4-n1000 t=6] nDCG@10=27.38 R@100=25.87 mean=6.79ms p50=6.27 p95=11.17 build=0.5489015000002837 rss=2.05GB
+scifact:test docs=5183 queries=300 load=1.8s rss=1.20GB
+[base_exact t=1] nDCG@10=87.83 R@100=100.00 mean=317.47ms p50=291.80 p95=582.45 build=8.37690620000103 rss=1.93GB
+[base_ssrpp t=1] nDCG@10=87.83 R@100=99.67 mean=189.09ms p50=160.23 p95=403.09 build=8.37690620000103 rss=2.00GB
+scifact:test docs=5183 queries=300 load=2.4s rss=1.20GB
+[repo_exact t=1] nDCG@10=87.83 R@100=100.00 mean(batch,incl build)=380.3ms build=8.931445500000336 rss=1.23GB
+[repo_ssrpp t=1] nDCG@10=87.83 R@100=99.67 mean(batch,incl build)=311.7ms build=None rss=1.29GB
+scifact:test docs=5183 queries=300 load=1.9s rss=1.20GB
+[fast_lat t=1] nDCG@10=87.83 R@100=100.00 mean=61.23ms p50=56.62 p95=101.26 build=1.2218659999998636 rss=2.01GB
+[fast_lat t=6] nDCG@10=87.83 R@100=100.00 mean=17.88ms p50=16.22 p95=31.77 build=1.2218659999998636 rss=2.02GB
+[fast_lat t=12] nDCG@10=87.83 R@100=100.00 mean=15.22ms p50=13.91 p95=28.30 build=1.2218659999998636 rss=2.04GB
+[fast_ssrpp t=1] nDCG@10=87.83 R@100=99.67 mean=99.25ms p50=96.90 p95=147.12 build=1.2218659999998636 rss=2.04GB
+[fast_ssrpp t=6] nDCG@10=87.83 R@100=99.67 mean=25.85ms p50=25.38 p95=37.70 build=1.2218659999998636 rss=2.04GB
+[fast_ssrpp t=12] nDCG@10=87.83 R@100=99.67 mean=21.86ms p50=21.64 p95=32.26 build=1.2218659999998636 rss=2.04GB
+scifact:test docs=5183 queries=300 load=2.0s rss=1.20GB
+[fast_tok t=6] nDCG@10=87.83 R@100=100.00 mean=41.29ms p50=37.77 p95=74.56 build=0.67594839999947 rss=2.04GB
+[fast_ub t=6] nDCG@10=87.83 R@100=100.00 mean=60.24ms p50=59.35 p95=88.31 build=0.67594839999947 rss=2.05GB
+D:\No-Kmeans-code-paper\repro\opt\ssr_opt\gpu_exact.py:45: UserWarning: Sparse invariant checks are implicitly disabled. Memory errors (e.g. SEGFAULT) will occur when operating on a sparse tensor which violates the invariants, but checks incur performance overhead. To silence this warning, explicitly opt in or out. See `torch.sparse.check_sparse_tensor_invariants.__doc__` for guidance.  (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\Context.cpp:767.)
+  self.A = torch.sparse_csr_tensor(  # int32 crow + col (must match)
+[gpu_exact t=0] nDCG@10=87.83 R@100=100.00 mean=60.35ms p50=34.71 p95=275.74 build=1.5951936000001297 rss=2.54GB
+[fast_lb-t4-n1000 t=6] nDCG@10=87.83 R@100=99.67 mean=18.71ms p50=18.39 p95=27.61 build=0.67594839999947 rss=2.55GB
+scifact:train docs=5183 queries=809 load=2.0s rss=1.20GB
+[base_exact t=1] nDCG@10=69.39 R@100=92.84 mean=364.22ms p50=337.07 p95=664.34 build=10.675377399998979 rss=1.94GB
+[base_ssrpp t=1] nDCG@10=69.35 R@100=91.98 mean=181.96ms p50=165.85 p95=336.55 build=10.675377399998979 rss=0.72GB
+scifact:train docs=5183 queries=809 load=2.2s rss=1.20GB
+[repo_exact t=1] nDCG@10=69.39 R@100=92.84 mean(batch,incl build)=347.1ms build=8.454063099998166 rss=1.24GB
+[repo_ssrpp t=1] nDCG@10=69.35 R@100=91.98 mean(batch,incl build)=212.1ms build=None rss=1.32GB
+scifact:train docs=5183 queries=809 load=1.8s rss=1.20GB
+[fast_lat t=1] nDCG@10=69.39 R@100=92.84 mean=60.21ms p50=56.73 p95=97.44 build=1.0485856999985117 rss=2.02GB
+[fast_lat t=6] nDCG@10=69.39 R@100=92.84 mean=15.17ms p50=14.05 p95=24.63 build=1.0485856999985117 rss=2.03GB
+[fast_lat t=12] nDCG@10=69.39 R@100=92.84 mean=12.71ms p50=11.46 p95=22.06 build=1.0485856999985117 rss=2.05GB
+[fast_ssrpp t=1] nDCG@10=69.35 R@100=91.98 mean=99.57ms p50=96.95 p95=143.52 build=1.0485856999985117 rss=2.05GB
+[fast_ssrpp t=6] nDCG@10=69.35 R@100=91.98 mean=22.69ms p50=21.64 p95=33.25 build=1.0485856999985117 rss=2.05GB
+[fast_ssrpp t=12] nDCG@10=69.35 R@100=91.98 mean=16.57ms p50=15.83 p95=25.25 build=1.0485856999985117 rss=2.05GB
+scifact:train docs=5183 queries=809 load=1.9s rss=1.20GB
+[fast_tok t=6] nDCG@10=69.39 R@100=92.84 mean=36.49ms p50=33.80 p95=61.92 build=0.6559749999996711 rss=2.05GB
+[fast_ub t=6] nDCG@10=69.39 R@100=92.84 mean=58.77ms p50=57.12 p95=85.53 build=0.6559749999996711 rss=2.06GB
+D:\No-Kmeans-code-paper\repro\opt\ssr_opt\gpu_exact.py:45: UserWarning: Sparse invariant checks are implicitly disabled. Memory errors (e.g. SEGFAULT) will occur when operating on a sparse tensor which violates the invariants, but checks incur performance overhead. To silence this warning, explicitly opt in or out. See `torch.sparse.check_sparse_tensor_invariants.__doc__` for guidance.  (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\Context.cpp:767.)
+  self.A = torch.sparse_csr_tensor(  # int32 crow + col (must match)
+[gpu_exact t=0] nDCG@10=69.39 R@100=92.84 mean=10.88ms p50=10.74 p95=12.49 build=1.0485499999995227 rss=2.37GB
+[fast_lb-t4-n1000 t=6] nDCG@10=69.39 R@100=92.59 mean=15.94ms p50=15.36 p95=23.59 build=0.6559749999996711 rss=2.38GB
+opt/run_all.sh: line 69: syntax error near unexpected token `)'
+opt/run_all.sh: line 69: `  fiqa_all) fiqa_fast; fiqa_sweep; fiqa_sub; fiqa_base ;;'
